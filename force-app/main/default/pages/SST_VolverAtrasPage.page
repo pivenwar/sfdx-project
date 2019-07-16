@@ -1,0 +1,13 @@
+<apex:page docType="html-5.0" lightningStylesheets="true">
+   
+    <style type="text/css">
+        a:link {text-decoration:none; color: #1a4ad6;} /* Link no visitado*/
+        a:visited {text-decoration:none; color:black} /*Link visitado*/
+        a:active {text-decoration:none; color:#1a4ad6; } /*Link activo*/
+        a:hover {text-decoration:underline; color:#1a4ad6; } /*Mause sobre el link*/
+    </style>
+    
+    <br />
+    <a href="javascript:history.go(-1)" title="Volver atrás" style="font-size:14px">&laquo; Volver a la vista anterior</a>
+
+</apex:page>

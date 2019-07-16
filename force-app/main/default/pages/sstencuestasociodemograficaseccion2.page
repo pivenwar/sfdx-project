@@ -1,0 +1,260 @@
+<apex:page id="sstencuestasociodemograficaseccion2" showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false"
+           applyBodyTag="false" docType="html-5.0" lightningStylesheets="true" 
+           controller="SST_EncuestaSociodemograficaCC">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="es">
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <head>
+            <meta charset="utf-8" />
+            <meta http-equiv="x-ua-compatible" content="ie=edge" />
+            <title>ENCUESTA</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+             
+            <!-- Import the Design System style sheet -->
+            <apex:slds />
+            
+            <!-- Recurso estático para indicar que se está ejecutando una acción en la página -->
+            <c:SST_StatusLoading />
+        </head>
+       
+        <body class="slds-scope">    
+            <apex:form styleClass="myForm3">
+                <!-- Bloque con la segunda sección de la encuesta -->
+                <apex:pageBlock id="seccion2" >                     
+                    <b> 
+                        SECCION 2: CARACTERIZACIÓN LABORAL
+                    </b>
+                    <br /><br />
+                    <div class="slds-form slds-form_stacked" role="list">
+                        <p><b>
+                            Los cambios en los datos de esta subsección serán notificados al área responsable para que desde allí se realice la respectiva actualización:
+                            </b></p>
+                        <br />
+                        <div class="slds-grid slds-gutters_small">
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">{!$ObjectType.Contact.fields.SST_Tipo_Contrato__c.label}</span>
+                                    <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                    <div class="slds-form-element__control">
+                                        <div id="input-21-1-1" class="slds-select_container" style="display:none;">
+                                            <apex:selectList id="input-21-1" value="{!contacto.tipoContrato}"  multiselect="false" styleClass="slds-select" size="1" style="display:none;height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">                                                                                    
+                                                <apex:selectOptions id="input-select-21-1" value="{!tipoContrato}"/>
+                                            </apex:selectList> 
+                                        </div>
+                                        <apex:outputText id="input-21" style="width:90%;background-color:#ffffff;" value="{!MapaTipoContrato[contacto.tipoContrato]}" />
+                                        <button id="boton21" type="button" styleClass="slds-icon_container slds-icon-utility-delete" style="text-decoration:none;border:none" onclick="habilitar('input-21-1-1','input-21-1','input-21','boton21');" reRender="input-21,input-21-1,input-21-1-1" >
+                                            <c:SST_ImagenesSVG styleClass="slds-icon slds-icon-text-default slds-icon_xx-small" path="/assets/icons/utility-sprite/svg/symbols.svg#edit" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">{!$ObjectType.Contact.fields.SST_Cargo__c.Label}</span>
+                                    <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                    <div class="slds-form-element__control">
+                                        <apex:input id="input-22-1" styleClass="slds-input" style="display:none;width:100%;background-color:#ffffff;" value="{!contacto.cargo}" onkeypress="return inputLimiter(event,'Letters');" html-onpaste="return false" required="true"/>
+                                        <apex:outputText id="input-22" style="width:90%;background-color:#ffffff;" value="{!contacto.cargo}" />
+                                        <button id="boton22" type="button"  styleClass="slds-icon_container slds-icon-utility-delete" style="text-decoration:none;border:none" onclick="habilitar('input','input-22-1','input-22','boton22');" reRender="input-22,input-22-1" >
+                                            <c:SST_ImagenesSVG styleClass="slds-icon slds-icon-text-default slds-icon_xx-small" path="/assets/icons/utility-sprite/svg/symbols.svg#edit" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-gutters_small">
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">{!$ObjectType.Contact.fields.SST_sede__c.label}</span>
+                                    <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                    <div class="slds-form-element__control">
+                                        <div id="input-23-1-1" class="slds-select_container" style="display:none;">
+                                            <apex:selectList id="input-23-1" value="{!contacto.sede}"  multiselect="false" styleClass="slds-select" size="1" style="display:none;height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">                                                                                    
+                                                <apex:selectOptions id="input-select-23-1" value="{!sede}"/>
+                                            </apex:selectList> 
+                                        </div>
+                                        <apex:outputText id="input-23" style="width:90%;background-color:#ffffff;" value="{!MapaSede[contacto.sede]}" />
+                                        <button id="boton23" type="button" styleClass="slds-icon_container slds-icon-utility-delete" style="text-decoration:none;border:none" onclick="habilitar('input-23-1-1','input-23-1','input-23','boton23');" reRender="input-23,input-23-1,input-23-1-1" >
+                                            <c:SST_ImagenesSVG styleClass="slds-icon slds-icon-text-default slds-icon_xx-small" path="/assets/icons/utility-sprite/svg/symbols.svg#edit" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">{!$ObjectType.Contact.fields.SST_Area_Trabajo__c.Label}</span>
+                                    <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                    <div class="slds-form-element__control">
+                                        <div id="input-24-1-1" class="slds-select_container" style="display:none;">
+                                            <apex:selectList id="input-24-1" value="{!contacto.area}"  multiselect="false" styleClass="slds-select" size="1" style="display:none;height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">                                                                                    
+                                                <apex:selectOptions id="input-select-24-1" value="{!area}"/>
+                                            </apex:selectList> 
+                                        </div>
+                                        <apex:outputText id="input-24" style="width:90%;background-color:#ffffff;" value="{!MapaArea[contacto.area]}" />
+                                        <button id="boton24" type="button" styleClass="slds-icon_container slds-icon-utility-delete" style="text-decoration:none;border:none" onclick="habilitar('input-24-1-1','input-24-1','input-24','boton24');" reRender="input-24,input-24-1,input-24-1-1" >
+                                            <c:SST_ImagenesSVG styleClass="slds-icon slds-icon-text-default slds-icon_xx-small" path="/assets/icons/utility-sprite/svg/symbols.svg#edit" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-gutters_small">
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">{!$ObjectType.Contact.fields.SST_EPS__c.label}</span>
+                                    <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                    <div class="slds-form-element__control">
+                                        <div id="input-26-1-1" class="slds-select_container" style="display:none;">
+                                            <apex:selectList id="input-26-1" value="{!contacto.eps}"  multiselect="false" styleClass="slds-select" size="1" style="display:none;height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">                                                                                    
+                                                <apex:selectOptions id="input-select-26-1" value="{!eps}"/>
+                                            </apex:selectList> 
+                                        </div>
+                                        <apex:outputText id="input-26" style="width:90%;background-color:#ffffff;" value="{!MapaEPS[contacto.eps]}" />
+                                        <button id="boton26" type="button" styleClass="slds-icon_container slds-icon-utility-delete" style="text-decoration:none;border:none" onclick="habilitar('input-26-1-1','input-26-1','input-26','boton26');" reRender="input-26,input-26-1,input-26-1-1" >
+                                            <c:SST_ImagenesSVG styleClass="slds-icon slds-icon-text-default slds-icon_xx-small" path="/assets/icons/utility-sprite/svg/symbols.svg#edit" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">{!$ObjectType.Contact.fields.SST_ARL__c.label}</span>
+                                    <div class="slds-form-element__control">
+                                        <apex:outputText style="width:90%;background-color:#ffffff;" value="{!contacto.arl}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-gutters_small">
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">{!$ObjectType.Contact.fields.SST_Fondo_Pensiones__c.label}</span>
+                                    <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                    <div class="slds-form-element__control">
+                                        <div id="input-29-1-1" class="slds-select_container" style="display:none;">
+                                            <apex:selectList id="input-29-1" value="{!contacto.fondoPensiones}"  multiselect="false" styleClass="slds-select" size="1" style="display:none;height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">                                                                                    
+                                                <apex:selectOptions id="input-select-29-1" value="{!afp}"/>
+                                            </apex:selectList> 
+                                        </div>
+                                        <apex:outputText id="input-29" style="width:90%;background-color:#ffffff;" value="{!MapaAFP[contacto.fondoPensiones]}" />
+                                        <button id="boton29" type="button" styleClass="slds-icon_container slds-icon-utility-delete" style="text-decoration:none;border:none" onclick="habilitar('input-29-1-1','input-29-1','input-29','boton29');" reRender="input-29,input-29-1,input-29-1-1" >
+                                            <c:SST_ImagenesSVG styleClass="slds-icon slds-icon-text-default slds-icon_xx-small" path="/assets/icons/utility-sprite/svg/symbols.svg#edit" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">{!$ObjectType.Contact.fields.SST_Fondo_Cesantias__c.label}</span>
+                                    <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                    <div class="slds-form-element__control">
+                                        <div id="input-30-1-1" class="slds-select_container" style="display:none;">
+                                            <apex:selectList id="input-30-1" value="{!contacto.fondoCesantias}"  multiselect="false" styleClass="slds-select" size="1" style="display:none;height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">                                                                                    
+                                                <apex:selectOptions id="input-select-30-1" value="{!afp}"/>
+                                            </apex:selectList> 
+                                        </div>
+                                        <apex:outputText id="input-30" style="width:90%;background-color:#ffffff;" value="{!MapaAFP[contacto.fondoCesantias]}" />
+                                        <button id="boton30" type="button" styleClass="slds-icon_container slds-icon-utility-delete" style="text-decoration:none;border:none" onclick="habilitar('input-30-1-1','input-30-1','input-30','boton30');" reRender="input-30,input-30-1,input-30-1-1" >
+                                            <c:SST_ImagenesSVG styleClass="slds-icon slds-icon-text-default slds-icon_xx-small" path="/assets/icons/utility-sprite/svg/symbols.svg#edit" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br /><br />
+                        <p><b>
+                            Los datos de esta subsección serán actualizados directamente al finalizar la encuesta:
+                            </b></p>
+                        <br />   
+                        <div class="slds-grid slds-gutters_small">
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">{!$ObjectType.SST_Informacion_sociodemografica__c.fields.Antiguedad__c.inlineHelpText}</span>
+                                    <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                    <div class="slds-form-element__control">
+                                        <div id="input-28-1-1" class="slds-select_container">
+                                            <apex:selectList title="En caso de tener una antigüedad interrumpida, sume los diferentes periodos" id="input-28-1" value="{!infoContacto.Antiguedad__c}"  multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">                                                                                    
+                                                <apex:selectOptions id="input-select-28-1" value="{!antiguedad}"/>
+                                            </apex:selectList> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">{!$ObjectType.SST_Informacion_sociodemografica__c.fields.Antiguedad_cargo__c.inlineHelpText}</span>
+                                    <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                    <div class="slds-form-element__control">
+                                        <div id="input-27-1-1" class="slds-select_container">
+                                            <apex:selectList id="input-27-1" value="{!infoContacto.Antiguedad_cargo__c}"  multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">                                                                                    
+                                                <apex:selectOptions id="input-select-27-1" value="{!antiguedad}"/>
+                                            </apex:selectList> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-gutters_small">
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">{!$ObjectType.SST_Informacion_sociodemografica__c.fields.Grupo_sindical__c.inlineHelpText}</span>
+                                    <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                    <div class="slds-form-element__control">
+                                        <div id="input-31-1-1" class="slds-select_container" >
+                                            <apex:selectList id="input-31-1" value="{!infoContacto.Grupo_sindical__c}"  multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">                                                                                    
+                                                <apex:selectOption id="input-select1-31-1" itemValue="-- Seleccione --" itemLabel="-- Seleccione --" />
+                                                <apex:selectOption id="input-select2-31-1" itemValue="NO" itemLabel="NO" />
+                                                <apex:selectOption id="input-select3-31-1" itemValue="SI" itemLabel="SI" />
+                                            </apex:selectList> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">{!$ObjectType.SST_Informacion_sociodemografica__c.fields.experiencia__c.inlineHelpText}</span>
+                                    <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                    <div class="slds-form-element__control">
+                                        <div id="input-32-1-1" class="slds-select_container" >
+                                            <apex:selectList id="input-32-1" value="{!infoContacto.experiencia__c}"  multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">                                                                                    
+                                                <apex:selectOptions id="input-select-32-1" value="{!antiguedad}"/>
+                                            </apex:selectList> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-gutters_small">
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">{!$ObjectType.SST_Informacion_sociodemografica__c.fields.Ingresos__c.inlineHelpText}</span>
+                                    <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                    <div class="slds-form-element__control">
+                                        <div id="input-25-1-1" class="slds-select_container" >
+                                            <apex:selectList id="input-25-1" value="{!infoContacto.Ingresos__c}"  multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">                                                                                    
+                                                <apex:selectOptions id="input-select-25-1" value="{!ingresos}"/>
+                                            </apex:selectList> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="flex-container" >
+                        <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--4-of-4 slds-text-align_right">
+                                <button type="button" style="width:8%" target="_self" class="slds-button slds-button_neutral" onclick="devolver('2');"  >Atrás</button>
+                                <button type="button" target="_self" class="slds-button slds-button_brand" onclick="validarSeccion('2');"  >Siguiente</button>
+                            </div>
+                            <apex:actionFunction action="{!irAdelante}" onbeforedomupdate="hideLoadingDialog();" reRender="mensajeGlobal,secciones" name="irSeccion3" />
+                            <apex:actionFunction action="{!irAtras}" onbeforedomupdate="hideLoadingDialog();" reRender="secciones" name="irAtras1" />
+                        </div>
+                    </div>
+                </apex:pageBlock> 
+            </apex:form>
+        </body>
+    </html>
+</apex:page>

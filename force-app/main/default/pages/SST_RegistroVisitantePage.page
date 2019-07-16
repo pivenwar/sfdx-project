@@ -1,0 +1,470 @@
+<apex:page docType="html-5.0" lightningStylesheets="true"   controller="SST_RegistroVisitantesCC" >
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <!-- Recuso utilizado para el modal con la suma total de los pesos -->
+        <script src="https://code.jquery.com/jquery-1.12.4.js"/>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        
+        <!-- Recurso estático para indicar que se está ejecutando una acción en la página -->
+        <c:SST_StatusLoading />
+        
+        <head>
+            <!-- Lightning Design System Source -->
+            <apex:slds />
+        </head>
+        
+        <style>    
+            .slds-scope .slds-select_container::before { 
+            border-bottom: none;
+            }
+            
+            .slds-scope .slds-select_container::after { 
+            height: 7px;
+            width: 7px;
+            top: 15px;
+            }
+            
+            
+            .headerRow .TableTitle {
+            text-align: center !important;
+            font-weight:bold !important; 
+            }
+            
+            body .bPageBlock, body #bodyCell .bResource .secondaryPalette, 
+            body .secondaryPalette.bPageBlock, body .individualPalette .secondaryPalette.bPageBlock, 
+            body .bodyDiv .genericTable, body .genericPageBlockTable, body .bodyDiv .bSubBlock, 
+            body .bComponentBlock .bPageBlock, body .bMyDashboard .bPageBlock, body.rlHoverFrame .bPageBlock, 
+            body.subjectSelectionPopup div.choicesBox, body.lookupTab .secondaryPalette.bPageBlock, 
+            body.popupTab .secondaryPalette.bPageBlock, body.UserTagStatsPage .secondaryPalette.bPageBlock {
+            border-top: 1px solid  #eaeaea !important;
+            border-color: #eaeaea !important;
+            border-top-color: rgb(234, 234, 234);
+            }
+            
+            .slds-input{
+            color: black;
+            border: 1px solid #bdbbb1;
+            border-radius: .25rem;
+            text-align:left;
+            transition: border .1s linear,background-color .1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 .75rem;
+            padding-right: 1.8rem;
+            width: 80px;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            }
+            
+            .slds-input-hbt{
+            color: black;
+            border: 1px solid #bdbbb1;
+            border-radius: .25rem;
+            text-align:left;
+            transition: border .1s linear,background-color .1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 .75rem;
+            padding-right: 1.8rem;
+            width: 80px;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            }
+            
+            .slds-input-header{
+            color: black;
+            border-radius: .25rem;
+            text-align:left;
+            transition: border .1s linear,background-color .1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 .75rem;
+            padding-right: 1.8rem;
+            width: 80px;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            }
+            
+            
+            
+        </style>
+        
+        
+        <script>
+        
+        var j$ =jQuery.noConflict(); 
+
+        
+        // Access webcam
+        function initCamera() {
+            var video = j$('video');
+            if(video!=null){
+                navigator.mediaDevices.getUserMedia({video: true})
+                // permission granted:
+                .then(function(stream) {
+                    
+                    video[0].srcObject = stream;
+                    video[0].play();
+                })
+                // permission denied:
+                .catch(function(error) {
+                    //alert('Si desea capturar imágenes debe permitir el acceso a la cámara'+error.toString());
+                });
+            }
+            
+        }// Draw image
+        function tomarFoto(){
+            // Draw image
+            var canvas = j$('canvas');
+            var video = j$('video');
+            var context = canvas[0].getContext('2d');
+            context.drawImage(video[0], 0, 0, 120,80);              
+        }
+        function guardarFoto(){
+            var canvas = j$('canvas');
+            var dataURL = canvas[0].toDataURL("image/jpeg", 0.5);
+            var input = j$('input');
+            input.val = dataURL;
+            callcontroller(dataURL);
+        }
+        
+        //Método para abrir el modal de busqueda de los funcionarios destinos
+        function abrirModalFuncionarioDestino(){
+            j$('#slds-backdrop-funcionarioDestino').addClass('slds-backdrop_open');
+            j$('#modalFuncionarioDestino').addClass('slds-fade-in-open'); 
+            
+        } 
+        
+        //Método para cerrar el modal de busqueda de los funcionarios destinos
+        function cerrarModalFuncionarioDestino(){
+            j$('#modalFuncionarioDestino').removeClass('slds-fade-in-open');
+            j$('#slds-backdrop-funcionarioDestino').removeClass('slds-backdrop_open'); 
+        }
+        
+        
+        
+        
+        </script>
+        
+        <body class="slds-scope">
+            
+            <div class="slds-grid slds-text-align_center">
+                <div class="slds-col">
+                    <br />
+                    <div class="slds-text-heading_medium"><center><b>REGISTRO DE VISITANTES</b></center></div>
+                    <br />
+                </div>
+            </div>
+            
+            <apex:outputPanel id="mensaje">
+                <c:SST_Mensajes_Page id="mensajeGlobal" listaMensajes="{!mensajesPaginaPrincipal}"/>
+            </apex:outputPanel> 
+            
+            <apex:form id="formularioVisitantes">
+                
+                <!--Filtros de tipo y número de identificación-->
+                
+                <apex:pageBlock id="blockFiltros">
+                    <br/>   
+                    <apex:outputText style="font-weight: bold; float: center;white-space: normal; font-size: 0.9em; color: #000; font-family:'Salesforce Sans',Arial,sans-serif;" value="FILTROS DE BÚSQUEDA"/>
+                    <br/> <br/> 
+                    
+                    <apex:inputCheckbox value="{!lectorCedula}" >
+                        <apex:actionSupport event="onclick" reRender="blockFiltros"  onsubmit="showLoadingDialog();" oncomplete="hideLoadingDialog();" >
+                        </apex:actionSupport>
+                    </apex:inputCheckbox>
+                    <apex:outputText value="Utilizar lector de cédulas"/>
+                    <apex:pageBlockSection columns="2" id="blockFiltros" >
+                        <apex:panelGroup >
+                            <apex:outputText value="*" style="color: #CC0605"/>
+                            <apex:outputText value="Tipo identificación"/>
+                            <div  class="slds-select_container" >
+                                <apex:selectList id="tipoIdentificacionFiltro" value="{!tipoIdentificacion}" styleClass="slds-select" size="1"  style="border:1px solid #bdbbb1  !important;">
+                                    <apex:selectOptions value="{!tiposIdentificacion}"/>
+                                </apex:selectList>
+                            </div>
+                        </apex:panelGroup>  
+                        <apex:panelGroup >
+                            <apex:outputText value="*" style="color: #CC0605"/>
+                            <apex:outputText value="Número de identificación"/>
+                            <apex:inputText id="numeroIdentificacionFiltro" value="{!numeroIdentificacion}"  styleClass="slds-input" style="width:100% !important;resize:vertical;"/>
+                        </apex:panelGroup>
+                        <apex:panelGroup rendered="{!lectorCedula}" >
+                            <apex:outputText value="*" style="color: #CC0605"/>
+                            <apex:outputText value="Nombre completo"/>
+                            <apex:inputText id="nombreCompletoFiltro" value="{!nombreFiltro}"  styleClass="slds-input" style="width:100% !important;resize:vertical;"/>                              
+                        </apex:panelGroup>  
+                        <apex:panelGroup rendered="{!lectorCedula}" >
+                            <apex:outputText value="*" style="color: #CC0605"/>
+                            <apex:outputText value="Tipo de Sangre"/>
+                            <div  class="slds-select_container" >
+                                <apex:selectList id="tipoSangreFiltro" value="{!tipoSangreFiltro}" styleClass="slds-select" size="1"  style="border:1px solid #bdbbb1  !important;">
+                                    <apex:selectOptions value="{!tipoSangre}"/>
+                                </apex:selectList>
+                            </div>
+                        </apex:panelGroup>
+                        
+                        
+                    </apex:pageBlockSection>
+                    
+                    <apex:pageBlockSection columns="2" >
+                        <apex:outputText value=""/>
+                        <apex:panelGroup >
+                            <br/>
+                            <apex:commandButton value="Consultar" action="{!consultarVisitante}" styleClass="slds-button slds-button_brand" style="width: 105px;float:right" reRender="blockVisitantes,blockDatosVisitante,mensajeGlobal,blockFiltros"
+                                                onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();initCamera();"/>
+                        </apex:panelGroup>
+                    </apex:pageBlockSection>
+                    <br/> 
+                </apex:pageBlock>
+                <br/>
+                
+                <!--Informacion del visitante encontrado o vacíos si se trata de un visitante nuevo-->
+                <apex:outputPanel id="blockDatosVisitante" >
+                    <apex:pageBlock rendered="{!visitante!=null}" id="blockFotos" >
+                        <!-- Stream video via webcam -->
+                        
+                        <br/>   
+                        <apex:outputText style="font-weight: bold; float: center;white-space: normal; font-size: 0.9em; color: #000; font-family:'Salesforce Sans',Arial,sans-serif;" value="DATOS DEL VISITANTE"/>
+                        <br/> <br/>
+                        <apex:pageBlockSection columns="2" >
+                            
+                            
+                            <apex:panelGroup >
+                                <div class="video-wrap">
+                                    <video id="video" width="120" height="80"></video>
+                                </div>
+                                <br/>
+                                <apex:commandButton value="Capturar" styleClass="slds-button slds-button_brand" style="width: 105px;float:left" reRender="canvas"
+                                                    onclick="tomarFoto();" />
+                                
+                            </apex:panelGroup>
+                            <apex:panelGroup >
+                                <apex:outputPanel >
+                                <apex:outputText value="Foto" style="font-weight: bold;"/>
+                                <br/>
+                                <canvas id="canvas" width="120" height="80"
+                                        style="border:1px solid #000000;" ></canvas>
+                            </apex:outputPanel>
+                                <apex:outputPanel rendered="{!idFoto != null}">
+                                <apex:image url="/servlet/servlet.FileDownload?file={!idFoto}" width="120" height="80"/>
+                                    </apex:outputPanel>
+                            </apex:panelGroup>
+                        </apex:pageBlockSection>
+                    </apex:pageBlock>
+                    <apex:pageBlock rendered="{!visitante!=null}" id="blockDatos" >
+                        <!-- Stream video via webcam -->
+                        
+                        
+                        <apex:pageBlockSection columns="2" >
+                            
+                            
+                            <apex:panelGroup >
+                                <apex:outputText value="Tipo visitante" style="font-weight: bold;"/>
+                                <div  >
+                                    <apex:outputText value="{!visitante.tipoVisitante}" />
+                                </div>
+                            </apex:panelGroup>  
+                            <apex:panelGroup rendered="{!visitante.estado!=null}">
+                                <apex:outputText value="Empresa que representa" style="font-weight: bold;"/>
+                                <div  >
+                                    <apex:outputText value="{!visitante.empresaRepresentacion} - {!visitante.estado}" />
+                                </div>
+                            </apex:panelGroup>  
+                            <apex:panelGroup rendered="{!visitante.estado==null}">
+                                <apex:outputText value="*" style="color: #CC0605"/>
+                                <apex:outputText value="Empresa que representa" style="font-weight: bold;"/>
+                                <apex:inputText value="{!visitante.empresaRepresentacion}" styleClass="slds-input" style="width:100% !important;resize:vertical;" />
+                                
+                            </apex:panelGroup> 
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="2" >
+                            <apex:panelGroup >
+                                <apex:outputText value="Tipo identificación" style="font-weight: bold;"/>
+                                <div  >
+                                    <apex:outputText value="{!tipoIdentificacionMostrar}" />
+                                </div>
+                            </apex:panelGroup>  
+                            <apex:panelGroup >
+                                <apex:outputText value="Número identificación" style="font-weight: bold;"/>
+                                <div  >
+                                    <apex:outputText value="{!numeroIdentificacion}" />
+                                </div>
+                            </apex:panelGroup>                        
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="2" >
+                            <apex:panelGroup rendered="{!!lectorCedula}" >
+                                <apex:outputText value="*" style="color: #CC0605"/>
+                                <apex:outputText value="Nombre completo" style="font-weight: bold;"/>
+                                <apex:inputText value="{!visitante.nombre}"  styleClass="slds-input" style="width:100% !important;resize:vertical;"/>                              
+                            </apex:panelGroup>  
+                            <apex:panelGroup rendered="{!!lectorCedula}" >
+                                <apex:outputText value="*" style="color: #CC0605"/>
+                                <apex:outputText value="Tipo de Sangre" style="font-weight: bold;"/>
+                                <div  class="slds-select_container" >
+                                    <apex:selectList id="rh" value="{!visitante.tipoSangre}" styleClass="slds-select" size="1"  style="border:1px solid #bdbbb1  !important;">
+                                        <apex:selectOptions value="{!tipoSangre}"/>
+                                    </apex:selectList>
+                                </div>
+                            </apex:panelGroup>
+                            <apex:panelGroup rendered="{!lectorCedula}">
+                                <apex:outputText value="Nombre completo" style="font-weight: bold;"/>
+                                <div  >
+                                    <apex:outputText value="{!visitante.nombre}" />
+                                </div>
+                            </apex:panelGroup>  
+                            <apex:panelGroup rendered="{!lectorCedula}" >
+                                <apex:outputText value="Tipo de Sangre"/>
+                                <div  >
+                                    <apex:outputText value="{!visitante.tipoSangre}" />
+                                </div>
+                            </apex:panelGroup>  
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="2" >
+                            <apex:panelGroup >
+                                <apex:outputText value="*" style="color: #CC0605"/>
+                                <apex:outputText value="Entidad Promotora de Salud" style="font-weight: bold;"/>
+                                <div  class="slds-select_container" >
+                                    <apex:selectList id="eps" value="{!visitante.eps}" styleClass="slds-select" size="1"  style="border:1px solid #bdbbb1  !important;"  >
+                                        <apex:selectOptions value="{!eps}"/>
+                                    </apex:selectList>                                
+                                </div>
+                            </apex:panelGroup>  
+                            <apex:panelGroup >
+                                <apex:outputText value="*" style="color: #CC0605"/>
+                                <apex:outputText value="Administradora de Riesgos Laborales" style="font-weight: bold;"/>
+                                <div  class="slds-select_container" >
+                                    <apex:selectList id="arl" value="{!visitante.arl}" styleClass="slds-select" size="1"  style="border:1px solid #bdbbb1  !important;"  >
+                                        <apex:selectOptions value="{!arl}"/>
+                                    </apex:selectList>
+                                </div>
+                            </apex:panelGroup>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="2"  >
+                            <apex:panelGroup >
+                                <apex:outputText value="*" style="color: #CC0605"/>
+                                <apex:outputText value="Contacto emergencia" style="font-weight: bold;"/>
+                                <apex:inputText id="contactoEmergencia" value="{!visitante.contactoEmergencia}"  styleClass="slds-input" style="width:100% !important;resize:vertical;"/>                              
+                            </apex:panelGroup>  
+                            <apex:panelGroup >
+                                <apex:outputText value="*" style="color: #CC0605"/>
+                                <apex:outputText value="Teléfono emergencia" style="font-weight: bold;"/>
+                                <apex:inputText id="telefonoEmergencia" value="{!visitante.telefonoEmergencia}"  styleClass="slds-input" style="width:100% !important;resize:vertical;"/>                              
+                            </apex:panelGroup>                        
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="2"  >
+                            
+                            <apex:panelGroup >
+                                <apex:outputText value="*" style="color: #CC0605"/>
+                                <apex:outputText value="Funcionario Destino" style="font-weight: bold;"/>
+                                <apex:commandButton value="Seleccionar"  styleClass="slds-button slds-button_neutral" style="width: 105px;float:right" reRender="modalFuncionarioDestino,modalContainerFuncionarioDestino,divTableFuncionarioDestino,blockFuncionarioDestino" oncomplete="abrirModalFuncionarioDestino();"/>
+                                <br/>
+                                <apex:outputText id="funcionarioDestino" value="{!IF(visitante.funcionarioDestino== null,'No ha seleccionado el funcionario que visitará',visitante.funcionarioDestino)}" />                              
+                                
+                            </apex:panelGroup>  
+                            <apex:panelGroup >  
+                            </apex:panelGroup>    
+                            
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="1"  >
+                            <apex:panelGroup >  
+                                <apex:outputText value="Observaciones" style="font-weight: bold;"/>
+                                <apex:inputTextarea rows="2" id="observaciones" value="{!visitante.observaciones}"  styleClass="slds-input" style="width:100% !important;resize:vertical;"/>                              
+                            </apex:panelGroup>    
+                            <input id="input" type="hidden"/>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="2"  >
+                            <apex:panelGroup >
+                            </apex:panelGroup>
+                            <apex:panelGroup >
+                                <apex:commandButton value="Registrar"   styleClass="slds-button slds-button_brand" style="width: 105px;float:right" 
+                                                    onclick="showLoadingDialog();" oncomplete="guardarFoto();hideLoadingDialog();"/>
+                                
+                                <apex:actionFunction name="callcontroller"  action="{!guardarVisitante}" reRender="valor,mensajeGlobal,formularioVisitantes">
+                                    
+                                    <apex:param value="" name="firstvalue" id="valor"/>
+                                    
+                                    
+                                    
+                                </apex:actionFunction>
+                                
+                            </apex:panelGroup>
+                        </apex:pageBlockSection>
+                        
+                    </apex:pageBlock>
+                </apex:outputPanel>
+                
+                
+                <div id="slds-backdrop" class="slds-backdrop"></div>
+                
+                
+                
+                
+                
+                
+                <section id="modalFuncionarioDestino" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+                    <div id="modalContainerFuncionarioDestino" class="slds-modal__container">
+                        
+                        <header id="headerModalFuncionarioDestino" class="slds-modal__header">
+                            <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModalFuncionarioDestino();">
+                                <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                   path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                <span class="slds-assistive-text">Cerrar</span>
+                            </button>
+                            <apex:outputText style="font-weight: 300; float: center;white-space: normal; font-size: 1.1rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="Funcionario a quien visita"/>
+                        </header>
+                        
+                        <div class="slds-modal__content slds-p-around_medium" id="divTableFuncionarioDestino">
+                            
+                            <apex:outputPanel >
+                                <apex:outputText value="*" style="color: #CC0605"/>
+                                <apex:outputText value="Nombre funcionario:   "/>
+                                
+                                <apex:inputText value="{!nombreFuncionarioFiltro}" styleClass="slds-input" style="width:100% !important;resize:vertical;"/>
+                            </apex:outputPanel>
+                            <br/>
+                            <br/>
+                            <apex:commandButton value="Consultar" action="{!consultarFuncionario}" styleClass="slds-button slds-button_brand" style="width: 105px;float:right" 
+                                                onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();" reRender="blockFuncionarioDestino,blockMensajeFuncionarioDestino"/>
+                            
+                            <br/>
+                            <br/>
+                            <apex:outputPanel id="blockFuncionarioDestino">
+                                <apex:pageBlock rendered="{!funcionarios<> null && funcionarios.size>0}" >
+                                    
+                                    <apex:pageBlockTable value="{!funcionarios}" var="funcionario" styleclass="slds-table slds-table_bordered slds-table_cell-buffer" border="1" >    
+                                        <apex:column headerValue="Nombre" headerClass="TableTitle" >    
+                                            
+                                            <apex:outputText style="float: left;white-space: normal" value="{!funcionario.name}"/>
+                                        </apex:column>   
+                                        <apex:column headerValue="Área" headerClass="TableTitle" >    
+                                            
+                                            <apex:outputText style="float: left;white-space: normal" value="{!funcionario.sst_area_trabajo__r.name}"/>
+                                        </apex:column>
+                                        <apex:column headerValue="Cargo" headerClass="TableTitle" >    
+                                            
+                                            <apex:outputText style="float: left;white-space: normal" value="{!funcionario.sst_cargo__r.name}"/>
+                                        </apex:column>
+                                        <apex:column headerValue="Acción" headerClass="TableTitle">
+                                            <apex:commandLink value="Seleccionar" action="{!seleccionarFuncionario}" reRender="funcionarioDestino" oncomplete="cerrarModalFuncionarioDestino();">
+                                                <apex:param name="valor" value="{!funcionario.id}" assignTo="{!funcionarioSeleccionado}"/>
+                                            </apex:commandLink>
+                                        </apex:column>
+                                    </apex:pageBlockTable>
+                                </apex:pageBlock>
+                                
+                            </apex:outputPanel>
+                            <apex:outputPanel id="blockMensajeFuncionarioDestino">
+                                <apex:pageBlock rendered="{!(funcionarios== null || funcionarios.size==0)&&(nombreFuncionarioFiltro<> null && nombreFuncionarioFiltro<>'')}" >
+                                    <apex:outputText style="font-weight: bold; float: center;white-space: normal; font-size: 0.9em; color: #000; font-family:'Salesforce Sans',Arial,sans-serif;" value="No se encontraron coincidencias con el nombre ingresado"/>
+                                </apex:pageBlock>
+                            </apex:outputPanel>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <apex:commandButton id="btnAceptar3" value="Cancelar"   styleClass="slds-button slds-button_neutral"  reRender="mensajeModal" onclick="cerrarModalFuncionarioDestino();"/>
+                        </footer>
+                    </div>
+                </section>
+                <div id="slds-backdrop-funcionarioDestino" class="slds-backdrop"></div>
+                
+                
+            </apex:form>
+        </body>
+    </html>
+</apex:page>

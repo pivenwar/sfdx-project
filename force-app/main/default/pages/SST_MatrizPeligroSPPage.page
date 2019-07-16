@@ -1,0 +1,551 @@
+<apex:page docType="html-5.0" lightningStylesheets="true"   controller="SST_MatrizPeligroSPCC" >
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <!-- Recuso utilizado para el modal con la suma total de los pesos -->
+        <script src="https://code.jquery.com/jquery-1.12.4.js"/>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        
+        <!-- Recurso estático para indicar que se está ejecutando una acción en la página -->
+        <c:SST_StatusLoading />
+        
+        <head>
+            <!-- Lightning Design System Source -->
+            <apex:slds />
+        </head>
+        
+        <style>    
+            .slds-scope .slds-select_container::before { 
+            border-bottom: none;
+            }
+            
+            .slds-scope .slds-select_container::after { 
+            height: 7px;
+            width: 7px;
+            top: 15px;
+            }
+            
+            
+            .headerRow .TableTitle {
+            text-align: center !important;
+            font-weight:bold !important; 
+            }
+            
+            body .bPageBlock, body #bodyCell .bResource .secondaryPalette, 
+            body .secondaryPalette.bPageBlock, body .individualPalette .secondaryPalette.bPageBlock, 
+            body .bodyDiv .genericTable, body .genericPageBlockTable, body .bodyDiv .bSubBlock, 
+            body .bComponentBlock .bPageBlock, body .bMyDashboard .bPageBlock, body.rlHoverFrame .bPageBlock, 
+            body.subjectSelectionPopup div.choicesBox, body.lookupTab .secondaryPalette.bPageBlock, 
+            body.popupTab .secondaryPalette.bPageBlock, body.UserTagStatsPage .secondaryPalette.bPageBlock {
+            border-top: 1px solid  #eaeaea !important;
+            border-color: #eaeaea !important;
+            border-top-color: rgb(234, 234, 234);
+            }
+            
+            .slds-input{
+            color: black;
+            border: 1px solid #bdbbb1;
+            border-radius: .25rem;
+            text-align:left;
+            transition: border .1s linear,background-color .1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 .75rem;
+            padding-right: 1.8rem;
+            width: 80px;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            }
+            
+            .slds-input-hbt{
+            color: black;
+            border: 1px solid #bdbbb1;
+            border-radius: .25rem;
+            text-align:left;
+            transition: border .1s linear,background-color .1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 .75rem;
+            padding-right: 1.8rem;
+            width: 80px;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            }
+            
+            .slds-input-header{
+            color: black;
+            border-radius: .25rem;
+            text-align:left;
+            transition: border .1s linear,background-color .1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 .75rem;
+            padding-right: 1.8rem;
+            width: 80px;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            }
+            
+        </style>
+        
+        <script>
+        
+        var j$ =jQuery.noConflict(); 
+        
+        //Método para abrir el modal de evaluación de un peligro
+        function abrirModalMatrizPeligro(){
+            //seleccionarPeligroEvaluacion();
+            j$('#slds-backdrop').addClass('slds-backdrop_open');
+            j$('#ModalEvaluacion').addClass('slds-fade-in-open'); 
+            
+        } 
+        
+        //Método para cerrar el modal de evaluación de un peligro
+        function cerrarModalMatrizPeligro(){
+            j$('#ModalEvaluacion').removeClass('slds-fade-in-open');
+            j$('#slds-backdrop').removeClass('slds-backdrop_open'); 
+        }
+        
+        //Método para abrir el modal de los expuestos planta
+        function abrirModalExpuestos(){
+            j$('#slds-backdrop-expuestos').addClass('slds-backdrop_open');
+            j$('#modalExpuestos').addClass('slds-fade-in-open'); 
+            
+        } 
+        
+        //Método para cerrar el modal de los expuestos planta
+        function cerrarModalExpuestos(){
+            j$('#modalExpuestos').removeClass('slds-fade-in-open');
+            j$('#slds-backdrop-expuestos').removeClass('slds-backdrop_open'); 
+        }
+        
+        function inputLimiter(e,allow) {
+        var AllowableCharacters = '';
+        if (allow == 'Letters'){AllowableCharacters=' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';}
+        if (allow == 'Numbers'){AllowableCharacters='1234567890';}
+        if (allow == 'NameCharacters'){AllowableCharacters=' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.\'';}
+        if (allow == 'NameCharactersAndNumbers'){AllowableCharacters='1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-\'';}
+        if (allow == 'Currency'){AllowableCharacters='1234567890.';}
+        
+        var k = document.all?parseInt(e.keyCode): parseInt(e.which);
+        if (k!=13 && k!=8 && k!=0){
+            if ((e.ctrlKey==false) && (e.altKey==false)) {
+                return (AllowableCharacters.indexOf(String.fromCharCode(k))!=-1);
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+        }
+        
+        </script>
+        <apex:outputPanel id="mensaje">
+            <c:SST_Mensajes_Page id="mensajeGlobal" listaMensajes="{!mensajesPaginaPrincipal}"/>
+        </apex:outputPanel> 
+        <body class="slds-scope">
+            <div class="slds-grid slds-text-align_center">
+                <div class="slds-col">
+                    <br />
+                    <div class="slds-text-heading_medium"><center><b>MATRIZ DE PELIGROS SP</b></center></div>
+                    <br />
+                </div>
+            </div>
+            
+            
+            <apex:form id="formularioPeligros">
+                <div  class="slds-grid slds-grid_align-end"> 
+                            <br/>
+                            <apex:commandButton styleClass="slds-button slds-button_brand" style="width: 105px;float:" value="Ver reporte" action="/{!idReporte}" />
+                    </div>
+                <br/>
+                <apex:pageBlock id="blockFiltros">
+                    <br/>   
+                    <apex:outputText style="font-weight: bold; float: center;white-space: normal; font-size: 0.9em; color: #000; font-family:'Salesforce Sans',Arial,sans-serif;" value="FILTROS DE BÚSQUEDA"/>
+                    <br/> <br/> 
+                     <apex:pageBlockSection columns="1">
+                            <apex:selectCheckboxes value="{!estadosSeleccionados}">
+                                <apex:selectOptions value="{!estados}" />
+                            </apex:selectCheckboxes>
+                    </apex:pageBlockSection>
+                                 <apex:outputText styleClass="slds-input-header" style="width:35% !important; margin-left:5px; background:#CC0605; border: 1px solid #CC0605;" value="" />                            
+                                 <apex:outputText styleClass="slds-input-header" style="width:28% !important;margin-left:5px; background:#FFA420; border: 1px solid #FFA420;" value="" />
+                                 <apex:outputText styleClass="slds-input-header" style="width:35% !important;margin-left:5px; background:rgb(0, 95, 178); border: 1px solid rgb(0, 95, 178);" value="" />
+                    <apex:pageBlockSection columns="2" >
+                        <apex:panelGroup >
+                            <apex:outputText value="Áreas de trabajo"/>
+                            <div  class="slds-select_container" >
+                                <apex:selectList id="area" value="{!area}" styleClass="slds-select" size="1"  style="border:1px solid #bdbbb1  !important;"  >
+                                    <apex:selectOptions value="{!areas}"/>
+                                </apex:selectList>
+                            </div>
+                        </apex:panelGroup>  
+                        
+                        <apex:panelGroup >
+                            <apex:outputText value="Valoración del Riesgo"/>
+                            <div  class="slds-select_container" >
+                                <apex:selectList id="valoracionRiesgoLista" value="{!valoracion}" styleClass="slds-select" size="1"  style="border:1px solid #bdbbb1  !important;"  >
+                                    <apex:selectOptions value="{!ValoresRiesgo}"/>
+                                </apex:selectList>
+                            </div>
+                        </apex:panelGroup>
+                    </apex:pageBlockSection>
+                    
+                    <apex:pageBlockSection columns="2" >
+                         <apex:outputText value=""/>
+                        <apex:panelGroup >
+                            <br/>
+                            <apex:commandButton value="Consultar" action="{!consultarPeligros}" styleClass="slds-button slds-button_neutral" style="width: 105px;float:right" reRender="blockPeligros,mensajeGlobal"
+                                                onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();"/>
+                        </apex:panelGroup>
+                    </apex:pageBlockSection>
+                    <br/> 
+                </apex:pageBlock>
+                <br/>
+                <div class="flex-container" >
+                    <div class="slds-grid slds-wrap slds-align_absolute-center">
+                        <apex:outputLabel id="paginadoSuperior" value="Página {!paginaActual} de {!paginas}"/>  
+                    </div>
+                    <div class="slds-grid slds-wrap slds-align_absolute-center">
+                        <apex:commandButton value="<<" action="{!verInicio}" styleClass="slds-button slds-button_neutral" style="width:15px;height:25px;float:center" reRender="blockPeligros,mensajeGlobal,paginadoSuperior,paginadoInferior,botonSiguienteS,botonAnteriorS,botonAnteriorI,botonSiguienteI" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();"/>
+                        <apex:commandButton value="<" action="{!verAnterior}" id="botonAnteriorS" disabled="{!paginaActual==1}" styleClass="slds-button slds-button_neutral" style="width:15px;height:25px;float:center" reRender="blockPeligros,mensajeGlobal,paginadoSuperior,paginadoInferior,botonSiguienteS,botonAnteriorS,botonAnteriorI,botonSiguienteI" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();"/>
+                        <apex:commandButton value=">" action="{!verSiguiente}" id="botonSiguienteS" disabled="{!paginaActual==paginas}" styleClass="slds-button slds-button_neutral" style="width:15px;height:25px;float:right" reRender="blockPeligros,mensajeGlobal,paginadoSuperior,paginadoInferior,botonSiguienteS,botonAnteriorS,botonAnteriorI,botonSiguienteI" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();"/>
+                        <apex:commandButton value=">>" action="{!verFinal}" styleClass="slds-button slds-button_neutral" style="width:15px;height:25px;float:right" reRender="blockPeligros,mensajeGlobal,paginadoSuperior,paginadoInferior,botonSiguienteS,botonAnteriorS,botonAnteriorI,botonSiguienteI" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();"/>
+                    </div>
+                </div> 
+                <apex:pageBlock id="blockPeligros">
+                    <apex:repeat value="{!peligros}" var="grupo">
+
+                        <br/> <br/>
+                        <apex:pageBlockTable value="{!peligros[grupo]}" var="peligro" styleclass="slds-table slds-table_bordered slds-table_cell-buffer" border="1" >    
+                            <apex:column headerValue="PELIGRO" headerClass="TableTitle" >    
+                                <apex:outputLink title="Ir al detalle del ítem para adjuntar archivos" value="{!peligro.url}" 
+                                                 target="_blank" style="float: left;white-space: normal">
+                                    <apex:outputText style="float: left;white-space: normal" value="{!peligro.peligro}" />
+                                </apex:outputLink>
+                               
+                            </apex:column>                    
+                            <apex:column headerValue="RUTINARIA" headerClass="TableTitle">
+                                <center><apex:inputCheckbox style="float: center;white-space: normal" value="{!peligro.rutinaria}" disabled="true" /></center>
+                            </apex:column>
+                            <apex:column headerValue="EXPUESTO" headerClass="TableTitle" >    
+                                <apex:outputText style="float: left;white-space: normal" value="{!peligro.expuesto}" />
+                            </apex:column> 
+                             <apex:column headerValue="FUENTE GENERADORA DEL PELIGRO" headerClass="TableTitle">
+                                <apex:outputText style="float: left;white-space: normal" value="{!peligro.fuenteGeneradoraPeligro}" />
+                            </apex:column>
+                            <apex:column headerValue="TRABAJADORES EXPUESTOS" headerClass="TableTitle" >
+                                <center><apex:commandLink value="{!peligro.numeroTrabajadoresExpuestos}" title="Ver lista de funcionarios expuestos al peligro" action="{!consultarExpuestos}" oncomplete="abrirModalExpuestos();" style="text-decoration:none" reRender="modalExpuestos,modalContainerExpuestos,divTableExpuestos,blockExpuestos">
+                                    <apex:param name="idPeligro" value="{!peligro.id}"/>
+                                    </apex:commandLink></center>
+                            </apex:column>
+                            <apex:column headerValue="ACCION" headerClass="TableTitle">
+                                <apex:commandButton value="{!peligro.estado}" action="{!seleccionarPeligroEvaluacion}" onclick="showLoadingDialog();" oncomplete="abrirModalMatrizPeligro();hideLoadingDialog();" styleClass="slds-button slds-button_brand" style="background-color: {!peligro.colorEstado};border-color: {!peligro.colorEstado};width:90px" reRender="mensajeGlobal,modal-heading-03,headerModal,ModalEvaluacion2,modal-heading-02,modal-heading-03,formEvaluacion2,formEvaluacion3,formEvaluacion4">
+                                    <apex:param name="idPeligro" value="{!peligro.id}"/>
+                                </apex:commandButton>
+                            </apex:column>
+                        </apex:pageBlockTable>
+                        <br/>
+                        <br/>
+                    </apex:repeat>
+                    <apex:actionFunction name="guardarPeligro" action="{!guardarPeligro}"  />
+                    <apex:actionFunction name="consultarExpuestos" action="{!consultarExpuestos}" reRender="modalExpuestos,modalContainerExpuestos,divTableExpuestos"/>
+                </apex:pageBlock>
+                
+                <div class="flex-container" >
+                    <div class="slds-grid slds-wrap slds-align_absolute-center">
+                        <apex:outputLabel id="paginadoInferior" value="Página {!paginaActual} de {!paginas}"/>  
+                    </div>
+                    <div class="slds-grid slds-wrap slds-align_absolute-center">
+                        
+                        <apex:commandButton value="<<" action="{!verInicio}" styleClass="slds-button slds-button_neutral" style="width:15px;height:25px;float:center" reRender="blockPeligros,mensajeGlobal,paginadoSuperior,paginadoInferior,botonSiguienteS,botonAnteriorS,botonAnteriorI,botonSiguienteI" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();"/>
+                        <apex:commandButton value="<" action="{!verAnterior}" id="botonAnteriorI" disabled="{!paginaActual==1}" styleClass="slds-button slds-button_neutral" style="width:15px;height:25px;float:center" reRender="blockPeligros,mensajeGlobal,paginadoSuperior,paginadoInferior,botonSiguienteS,botonAnteriorS,botonAnteriorI,botonSiguienteI" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();"/>
+                        <apex:commandButton value=">" action="{!verSiguiente}" id="botonSiguienteI" disabled="{!paginaActual==paginas}" styleClass="slds-button slds-button_neutral" style="width:15px;height:25px;float:right" reRender="blockPeligros,mensajeGlobal,paginadoSuperior,paginadoInferior,botonSiguienteS,botonAnteriorS,botonAnteriorI,botonSiguienteI" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();"/>
+                        <apex:commandButton value=">>" action="{!verFinal}" styleClass="slds-button slds-button_neutral" style="width:15px;height:25px;float:right" reRender="blockPeligros,mensajeGlobal,paginadoSuperior,paginadoInferior,botonSiguienteS,botonAnteriorS,botonAnteriorI,botonSiguienteI" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();"/>
+                        
+                    </div>
+                </div> 
+                
+                
+                 <div  class="slds-grid slds-grid_align-end"> 
+                            <br/>
+                            <apex:commandButton styleClass="slds-button slds-button_brand" style="width: 105px;float:" value="Ver reporte" action="/{!idReporte}" />
+                    </div>
+                <br/>
+           
+            
+            <!--Modal para la evaluación de un peligro-->
+           
+                <section id="ModalEvaluacion" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+                    <div id="ModalEvaluacion2" class="slds-modal__container">
+                        
+                        <header id="headerModal" class="slds-modal__header">
+                            <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModalMatrizPeligro();">
+                                <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                   path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                <span class="slds-assistive-text">Cerrar</span>
+                            </button>
+                            <apex:outputText id="modal-heading-03" style="font-weight: 300; float: center;white-space: normal; font-size: 1.1rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="PELIGRO: {!peligroSeleccionado.peligro}"/> 
+                        </header>
+                        
+                        <div class="slds-modal__content slds-p-around_medium" id="ModalEvaluacion3">
+                            <apex:outputPanel id="mensaje">
+                                <c:SST_Mensajes_Page id="mensajeModal" listaMensajes="{!mensajesModal}"/>
+                            </apex:outputPanel> 
+                            <!--pageBlock para la primer sección de la evaluación del peligro -->
+                            <apex:pageBlock id="formEvaluacion2" >
+                                <br/>
+                                <center><apex:outputText style="font-weight: bold; float: center;white-space: normal; font-size: 0.9em; color: #000; font-family:'Salesforce Sans',Arial,sans-serif;" value="SECCIÓN I: EVALUACIÓN DEL RIESGO"/></center>
+                                <br/>   
+                                <apex:pageBlockSection columns="2" >
+                                    <apex:panelGroup id="fuente">
+                                        <apex:outputText value="Fuente"/>
+                                        <apex:inputText styleClass="slds-input" style="width:100% !important;resize:vertical;" value="{!peligroSeleccionado.fuente}" />
+                                    </apex:panelGroup>
+                                    <apex:panelGroup >
+                                        <apex:outputText value="Medio"/>
+                                        <apex:inputText styleClass="slds-input" style="width:100% !important;resize:vertical;" value="{!peligroSeleccionado.medio}"/>
+                                    </apex:panelGroup>
+                                    <apex:panelGroup >
+                                        <apex:outputText value="Trabajador"/>
+                                        <apex:inputText styleClass="slds-input" style="width:100% !important;resize:vertical;" value="{!peligroSeleccionado.trabajador}" />
+                                    </apex:panelGroup>
+                                     <apex:panelGroup >
+                                        <apex:outputText value="Método"/>
+                                        <apex:inputText styleClass="slds-input" style="width:100% !important;resize:vertical;" value="{!peligroSeleccionado.metodo}" />
+                                    </apex:panelGroup>
+
+                                   
+                                </apex:pageBlockSection>
+                                
+                                <br/>
+                                <apex:outputText style="font-weight: bold; float: center;white-space: normal; font-size: 0.9em; color: #000; font-family:'Salesforce Sans',Arial,sans-serif;" value="Valoración Subjetiva"/>
+                                <br/> 
+                                <br/> 
+                                <apex:pageBlockSection columns="3" >
+                                    <apex:panelGroup id="nivelDeficiencia">
+										<apex:outputText value="* " style="color: #CC0605" />
+                                        <apex:outputText value="Nivel de Deficiencia"/>
+                                        <div  class="slds-select_container">
+                                            <apex:selectList id="deficiencia" value="{!peligroSeleccionado.nivelDeficiencia}" styleClass="slds-select" size="1"  style="border:1px solid #bdbbb1  !important;" title="{!ayudaNivelDeficiencia}">
+                                                <apex:selectOptions value="{!nivelesDeficiencia}"/>
+                                                <apex:actionSupport event="onchange" action="{!obtenerInterpretacion}" reRender="nivelDeficiencia,nivelProbabilidad,riesgoCualitativo"   onsubmit="showLoadingDialog();" oncomplete="hideLoadingDialog();"/>                                   
+                                            </apex:selectList>
+                                        </div>
+                                    </apex:panelGroup>              
+                                    <apex:panelGroup id="nivelExposicion">
+                                        <apex:outputText value="* " style="color: #CC0605" />
+                                        <apex:outputText value="Nivel de Exposición "/>
+                                        <div  class="slds-select_container">
+                                            <apex:selectList id="exposicion" value="{!peligroSeleccionado.nivelExposicion}" styleClass="slds-select" size="1"  style="border:1px solid #bdbbb1  !important;"  title="{!ayudaNivelExposicion}">
+                                                <apex:selectOptions value="{!nivelesExposicion}"/>
+                                                <apex:actionSupport event="onchange" action="{!obtenerInterpretacion}" reRender="nivelProbabilidad,riesgoCualitativo" onsubmit="showLoadingDialog();" oncomplete="hideLoadingDialog();"/>
+                                            </apex:selectList>
+                                        </div>
+                                    </apex:panelGroup>
+                                    <apex:panelGroup >
+                                        <apex:outputText value="* " style="color: #CC0605" />
+                                        <apex:outputText value="Nivel de Consecuencia"/>
+                                        <div  class="slds-select_container">
+                                            <apex:selectList id="consecuencia" value="{!peligroSeleccionado.nivelConsecuencia}" styleClass="slds-select" size="1" style="border:1px solid #bdbbb1  !important;" title="{!ayudaNivelConsecuencia}">
+                                                <apex:selectOptions value="{!nivelesConsecuencia}"/>
+                                                <apex:actionSupport event="onchange" action="{!obtenerInterpretacionRiesgo}" reRender="nivelProbabilidad,riesgoCualitativo"   onsubmit="showLoadingDialog();" oncomplete="hideLoadingDialog();"/> 
+                                            </apex:selectList>
+                                        </div>
+                                    </apex:panelGroup>                                    
+                                </apex:pageBlockSection>
+                                <br/>
+                                <apex:pageBlockSection columns="1" >
+                                    <apex:panelGroup id="nivelProbabilidad"  >
+                                        <apex:outputText value="Nivel de Probabilidad" title="Este campo se precarga al seleccionar los niveles de deficiencia y de exposición"/>
+                                        <apex:outputText styleClass="slds-input-hbt" style="width:100% !important" value=""  rendered="{!peligroSeleccionado.nivelProbabilidad == null}"  />
+                                        <apex:outputText styleClass="slds-input-hbt" style="width:100% !important;" value="{!peligroSeleccionado.nivelProbabilidad}"  rendered="{!peligroSeleccionado.nivelProbabilidad <> null}" title="{!ayudaNivelProbabilidad}"/>
+                                    </apex:panelGroup>
+                                    <apex:panelGroup id="riesgoCualitativo">
+                                        <apex:outputText value="Riesgo Cualitativo" title="Este campo se precarga al seleccionar los niveles de deficiencia, de exposición y de consecuencia"/>
+                                        <apex:outputText styleClass="slds-input-hbt" style="width:100% !important;background-color: {!peligroSeleccionado.colorCualitativo}" value=""  rendered="{!peligroSeleccionado.riesgoCualitativoTexto == null}"  />
+                                        <apex:outputText styleClass="slds-input-hbt"  style="width:100% !important;background-color: {!peligroSeleccionado.colorCualitativo}" value="{!peligroSeleccionado.riesgoCualitativoTexto}" rendered="{!peligroSeleccionado.riesgoCualitativoTexto <> null}" />
+                                    </apex:panelGroup>
+                                </apex:pageBlockSection>
+                                <br/>
+                                <apex:outputText style="font-weight: bold; float: center;white-space: normal; font-size: 0.9em; color: #000; font-family:'Salesforce Sans',Arial,sans-serif;" value="Valoración Objetiva"/>
+                                <br/> 
+                                <br/> 
+                                <apex:pageBlockSection columns="3">
+                                    <apex:panelGroup id="marcadorRiesgo">
+                                        <apex:outputText value="Marcador de Riesgo"/>
+                                        <apex:input styleClass="slds-input" style="width:100% !important;resize:vertical;"  value="{!peligroSeleccionado.marcadorRiesgo}"  type="number" onkeypress="return inputLimiter(event,'Numbers');"
+                                                    html-onpaste="return false"/>
+                                    </apex:panelGroup>    
+                                    <apex:panelGroup >
+                                        <apex:outputText value="Valor Comparativo"/>
+                                        <apex:input styleClass="slds-input" style="width:100% !important;resize:vertical;" value="{!peligroSeleccionado.valorComparativo}" type="number" onkeypress="return inputLimiter(event,'Numbers');"
+                                                    html-onpaste="return false"/>
+                                    </apex:panelGroup>  
+                                    
+                                    <apex:panelGroup id="riesgoCuantitativo">
+                                        <apex:outputText value="Riesgo Cuantitativo" title="Este campo se precarga al seleccionar el Marcador de Riesgo y el Valor Comparativo"/>
+                                        <apex:outputText styleClass="slds-input-hbt" style="width:100% !important" value=""  rendered="{!peligroSeleccionado.riesgoCuantitativoTexto == null}"  />
+                                        <apex:outputText styleClass="slds-input-hbt" style="width:100% !important;resize:vertical;" value="{!peligroSeleccionado.riesgoCuantitativoTexto}"  rendered="{!peligroSeleccionado.riesgoCuantitativoTexto <> null}" />
+                                    </apex:panelGroup>
+                                </apex:pageBlockSection>
+                                <br/>
+                                <br/>
+                                <apex:pageBlockSection columns="1">
+                                    <apex:panelGroup id="valoracionRiesgo">
+                                        <apex:outputText value="Valoración del riesgo" title="Este campo se precarga al cargar el Riesgo Cualitativo y el Riesgo Cuantitativo"/>
+                                        <apex:outputText styleClass="slds-input-hbt" style="width:100% !important; background-color: {!peligroSeleccionado.colorRiesgo}"  value=""  rendered="{!peligroSeleccionado.valoracionRiesgo == null}"  />
+                                        <apex:outputText styleClass="slds-input-hbt"  style="width:100% !important; background-color: {!peligroSeleccionado.colorRiesgo}"  value="{!peligroSeleccionado.valoracionRiesgo}"  rendered="{!peligroSeleccionado.valoracionRiesgo <> null}" />
+                                    </apex:panelGroup>
+                                </apex:pageBlockSection>
+                            </apex:pageBlock>
+                            <br/> 
+                            
+                            <!--pageBlock para la tercer sección de la evaluación del peligro -->
+                            <apex:pageBlock id="formEvaluacion4">
+                                <br/> 
+                                <center><apex:outputText style="font-weight: bold; float: center;white-space: normal; font-size: 0.9em; color: #000; font-family:'Salesforce Sans',Arial,sans-serif;" value="SECCIÓN II: DETERMINACIÓN DE CONTROLES"/></center>
+                                <br/> 
+                                
+                                <br/>
+                                                              
+                                        <apex:pageBlockSection columns="2">
+                                            
+                                            <apex:panelGroup >
+                                                <apex:outputText value="Eliminar"/>
+                                                <apex:inputText styleClass="slds-input" style="width:100% !important;resize:vertical;" value="{!peligroSeleccionado.eliminar}" />
+                                            </apex:panelGroup>   
+                                            
+                                             <apex:panelGroup >
+                                                <apex:outputText value="Sustituir"/>
+                                                <apex:inputText styleClass="slds-input" style="width:100% !important;resize:vertical;" value="{!peligroSeleccionado.sustituir}" />
+                                            </apex:panelGroup>     
+                                            
+                                        </apex:pageBlockSection>
+                                   
+                              
+                                <br/>
+                                <apex:pageBlockSection columns="1">
+                                    <apex:panelGroup >
+                                        <apex:outputText value="Controles de ingeniería"/>
+                                        <apex:inputText styleClass="slds-input" style="width:100% !important;resize:vertical;" value="{!peligroSeleccionado.controlesIngenieria}" />
+                                    </apex:panelGroup>
+                                
+                                    <apex:panelGroup >
+                                        <apex:outputText value="Controles administrativos"/>
+                                        <apex:inputText styleClass="slds-input" style="width:100% !important;resize:vertical;" value="{!peligroSeleccionado.controlesAdministrativos}" />
+                                    </apex:panelGroup>
+                                    
+                                    <apex:panelGroup >
+                                        <apex:outputText value="Señalización/Advertencias"/>
+                                        <apex:inputText styleClass="slds-input" style="width:100% !important;resize:vertical;" value="{!peligroSeleccionado.senalizacionAdvertencias}" />
+                                    </apex:panelGroup>
+                                    
+                                    <apex:panelGroup >
+                                        <apex:outputText value="Métodos Procedimientos"/>
+                                        <apex:inputText styleClass="slds-input" style="width:100% !important;resize:vertical;" value="{!peligroSeleccionado.metodosProcedimientos}" />
+                                    </apex:panelGroup>
+                                </apex:pageBlockSection>
+                                
+                                  <apex:pageBlockSection columns="2" id="panelCAP" >
+                                    <apex:panelGroup styleClass="col1" id="col1">
+                                        <apex:outputText value="Capacitaciones disponibles"/>
+                                        <apex:selectList style="width:100% !important;height:170px !important;" styleClass="slds-select" value="{!leftCAPSelected}" multiselect="true" size="5">
+                                            <apex:selectOptions value="{!unselectedCAPvalues}" />
+                                        </apex:selectList>
+                                        <br/><br/>
+                                        <center>
+                                            <apex:commandButton value="Asociar" action="{!selectCAPclick}" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();" styleClass="slds-button slds-button_neutral" style="text-decoration:none;width:40% !important;" reRender="panelCAP" />
+                                        </center>
+                                    </apex:panelGroup>
+                                    <apex:panelGroup styleClass="col3" id="col3">
+                                        <apex:outputText value="Capacitaciones asociadas"/>
+                                        <apex:selectList style="width:100% !important;height:170px !important;" styleClass="slds-select" value="{!rightCAPSelected}" multiselect="true"  size="5">
+                                            <apex:selectOptions value="{!SelectedCAPValues}" />
+                                        </apex:selectList>
+                                        <br/><br/>
+                                        <center>
+                                            <apex:commandButton value="Desasociar" action="{!unselectCAPclick}" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();" styleClass="slds-button slds-button_neutral" style="text-decoration:none;width:40% !important;" reRender="panelCAP" />
+                                        </center>
+                                    </apex:panelGroup>
+                                </apex:pageBlockSection> 
+                                
+                                <br/>
+                                <apex:pageBlockSection columns="2" id="panelEPP">
+                                    <apex:panelGroup >
+                                        <apex:outputText value="EPP disponibles"/>
+                                        <apex:selectList style="width:100% !important;height:170px !important;" styleClass="slds-select" value="{!leftEPPSelected}" multiselect="true" size="5">
+                                            <apex:selectOptions value="{!unselectedvalues}" />
+                                        </apex:selectList>
+                                        <br/><br/>
+                                        <center>
+                                            <apex:commandButton value="Asociar" action="{!selectclick}" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();" styleClass="slds-button slds-button_neutral" style="text-decoration:none;width:40% !important;" reRender="panelEPP" />
+                                        </center>
+                                    </apex:panelGroup>
+                                    <apex:panelGroup >
+                                        <apex:outputText value="EPP asociados"/>
+                                        <apex:selectList style="width:100% !important;height:170px !important;" styleClass="slds-select" value="{!rightEPPSelected}" multiselect="true"  size="5">
+                                            <apex:selectOptions value="{!SelectedValues}" />
+                                        </apex:selectList>
+                                        <br/><br/>
+                                        <center>
+                                            <apex:commandButton value="Desasociar" action="{!unselectclick}" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();" styleClass="slds-button slds-button_neutral" style="text-decoration:none;width:40% !important;" reRender="panelEPP" />
+                                        </center>
+                                    </apex:panelGroup>
+                                </apex:pageBlockSection> 
+                                <br/>
+                                <br/>
+                               <apex:pageBlockSection columns="1">  
+                                    <apex:panelGroup >
+                                        <apex:outputText value="Observaciones"/>
+                                        <apex:inputText styleClass="slds-input" style="width:100% !important;resize:vertical;" value="{!peligroSeleccionado.observaciones}" />
+                                    </apex:panelGroup>
+                               </apex:pageBlockSection> 
+                            </apex:pageBlock>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <button type="button" id='btnCerrar2' class="slds-button slds-button_neutral" data-dismiss="modal" onclick="cerrarModalMatrizPeligro();">Cancelar</button>
+                            <apex:commandButton id="btnAceptar2" value="Guardar"  action="{!guardarPeligro}" styleClass="slds-button slds-button_brand"  reRender="mensajeModal,formularioPeligros" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();if({!mensajesModal.size<=0})cerrarModalMatrizPeligro();"/>
+                            
+                        </footer>
+                    </div>
+                </section>
+                <div id="slds-backdrop" class="slds-backdrop"></div>
+                       
+            
+            
+            
+           
+                <section id="modalExpuestos" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+                    <div id="modalContainerExpuestos" class="slds-modal__container">
+                        
+                        <header id="headerModalExpuestos" class="slds-modal__header">
+                            <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModalExpuestos();">
+                                <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                   path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                <span class="slds-assistive-text">Cerrar</span>
+                            </button>
+                            <apex:outputText style="font-weight: 300; float: center;white-space: normal; font-size: 1.1rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="Trabajadores Expuestos"/>
+                        </header>
+                        
+                        <div class="slds-modal__content slds-p-around_medium" id="divTableExpuestos">
+                            <apex:pageBlock id="blockExpuestos">
+                                <apex:pageBlockTable value="{!expuestos}" var="expuesto">
+                                    <apex:column headerValue="CARGO" headerClass="TableTitle" >
+                                        <apex:outputText style="float: left;white-space: normal" value="{!expuesto.sst_cargo__r.name}" />
+                                    </apex:column>
+                                    
+                                    <apex:column headerValue="FUNCIONARIO" headerClass="TableTitle" >
+                                        <apex:outputText style="float: left;white-space: normal" value="{!expuesto.name}" />
+                                    </apex:column>
+                                    <apex:column headerValue="TIPO CONTRATO" headerClass="TableTitle" >
+                                        <apex:outputText style="float: left;white-space: normal" value="{!expuesto.SST_Tipo_Contrato__c}" />
+                                    </apex:column>
+                                </apex:pageBlockTable>
+                            </apex:pageBlock>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <apex:commandButton id="btnAceptar3" value="Aceptar"   styleClass="slds-button slds-button_brand"  reRender="mensajeModal,formularioPeligros" onclick="cerrarModalExpuestos();"/>
+                        </footer>
+                    </div>
+                </section>
+                <div id="slds-backdrop-expuestos" class="slds-backdrop"></div>
+            </apex:form>
+        </body>
+    </html>
+</apex:page>

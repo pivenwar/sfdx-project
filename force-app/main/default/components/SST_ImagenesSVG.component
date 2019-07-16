@@ -1,0 +1,8 @@
+<!--Componente para hacer uso de las imágenes SVG -->
+<apex:component >
+    <apex:attribute name="styleClass" type="String" description="Class for svg tag" />
+    <apex:attribute name="path" type="String" description="Path for svg tag" />
+    <svg aria-hidden="true" class="{!styleClass}" style="cursor: pointer;">
+        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, path)}" />
+    </svg>
+</apex:component>

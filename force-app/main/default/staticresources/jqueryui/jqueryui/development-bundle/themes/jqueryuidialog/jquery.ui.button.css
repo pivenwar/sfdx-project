@@ -1,0 +1,114 @@
+/*!
+ * jQuery UI Button 1.10.4
+ * http://jqueryui.com
+ *
+ * Copyright 2014 jQuery Foundation and other contributors
+ * Released under the MIT license.
+ * http://jquery.org/license
+ *
+ * http://api.jqueryui.com/button/#theming
+ */
+.jqueryuidialog .ui-button {
+	display: inline-block;
+	position: relative;
+	padding: 0;
+	line-height: normal;
+	margin-right: .1em;
+	cursor: pointer;
+	vertical-align: middle;
+	text-align: center;
+	overflow: visible; /* removes extra width in IE */
+}
+.jqueryuidialog .ui-button,
+.jqueryuidialog .ui-button:link,
+.jqueryuidialog .ui-button:visited,
+.jqueryuidialog .ui-button:hover,
+.jqueryuidialog .ui-button:active {
+	text-decoration: none;
+}
+/* to make room for the icon, a width needs to be set here */
+.jqueryuidialog .ui-button-icon-only {
+	width: 2.2em;
+}
+/* button elements seem to need a little more width */
+button.jqueryuidialog .ui-button-icon-only {
+	width: 2.4em;
+}
+.jqueryuidialog .ui-button-icons-only {
+	width: 3.4em;
+}
+button.jqueryuidialog .ui-button-icons-only {
+	width: 3.7em;
+}
+
+/* button text element */
+.jqueryuidialog .ui-button .ui-button-text {
+	display: block;
+	line-height: normal;
+}
+.jqueryuidialog .ui-button-text-only .ui-button-text {
+	padding: .4em 1em;
+}
+.jqueryuidialog .ui-button-icon-only .ui-button-text,
+.jqueryuidialog .ui-button-icons-only .ui-button-text {
+	padding: .4em;
+	text-indent: -9999999px;
+}
+.jqueryuidialog .ui-button-text-icon-primary .ui-button-text,
+.jqueryuidialog .ui-button-text-icons .ui-button-text {
+	padding: .4em 1em .4em 2.1em;
+}
+.jqueryuidialog .ui-button-text-icon-secondary .ui-button-text,
+.jqueryuidialog .ui-button-text-icons .ui-button-text {
+	padding: .4em 2.1em .4em 1em;
+}
+.jqueryuidialog .ui-button-text-icons .ui-button-text {
+	padding-left: 2.1em;
+	padding-right: 2.1em;
+}
+/* no icon support for input elements, provide padding by default */
+input.jqueryuidialog .ui-button {
+	padding: .4em 1em;
+}
+
+/* button icon element(s) */
+.jqueryuidialog .ui-button-icon-only .ui-icon,
+.jqueryuidialog .ui-button-text-icon-primary .ui-icon,
+.jqueryuidialog .ui-button-text-icon-secondary .ui-icon,
+.jqueryuidialog .ui-button-text-icons .ui-icon,
+.jqueryuidialog .ui-button-icons-only .ui-icon {
+	position: absolute;
+	top: 50%;
+	margin-top: -8px;
+}
+.jqueryuidialog .ui-button-icon-only .ui-icon {
+	left: 50%;
+	margin-left: -8px;
+}
+.jqueryuidialog .ui-button-text-icon-primary .ui-button-icon-primary,
+.jqueryuidialog .ui-button-text-icons .ui-button-icon-primary,
+.jqueryuidialog .ui-button-icons-only .ui-button-icon-primary {
+	left: .5em;
+}
+.jqueryuidialog .ui-button-text-icon-secondary .ui-button-icon-secondary,
+.jqueryuidialog .ui-button-text-icons .ui-button-icon-secondary,
+.jqueryuidialog .ui-button-icons-only .ui-button-icon-secondary {
+	right: .5em;
+}
+
+/* button sets */
+.jqueryuidialog .ui-buttonset {
+	margin-right: 7px;
+}
+.jqueryuidialog .ui-buttonset .ui-button {
+	margin-left: 0;
+	margin-right: -.3em;
+}
+
+/* workarounds */
+/* reset extra padding in Firefox, see h5bp.com/l */
+input.jqueryuidialog .ui-button::-moz-focus-inner,
+button.jqueryuidialog .ui-button::-moz-focus-inner {
+	border: 0;
+	padding: 0;
+}

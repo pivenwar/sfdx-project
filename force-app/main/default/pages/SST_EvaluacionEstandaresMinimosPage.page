@@ -1,0 +1,292 @@
+<apex:page docType="html-5.0" lightningStylesheets="true"   controller="SST_EstandaresMinimosCC" >
+    <!-- Recuso utilizado para el modal con la suma total de los pesos -->
+    <script src="https://code.jquery.com/jquery-1.12.4.js"/>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    
+    <!-- Recurso estático para indicar que se está ejecutando una acción en la página -->
+    <c:SST_StatusLoading />
+    
+    <!-- Lightning Design System Source -->
+    <apex:slds />
+    <style>
+      body .bPageBlock, body #bodyCell .bResource .secondaryPalette, 
+        body .secondaryPalette.bPageBlock, body .individualPalette .secondaryPalette.bPageBlock, 
+        body .bodyDiv .genericTable, body .genericPageBlockTable, body .bodyDiv .bSubBlock, 
+        body .bComponentBlock .bPageBlock, body .bMyDashboard .bPageBlock, body.rlHoverFrame .bPageBlock, 
+        body.subjectSelectionPopup div.choicesBox, body.lookupTab .secondaryPalette.bPageBlock, 
+        body.popupTab .secondaryPalette.bPageBlock, body.UserTagStatsPage .secondaryPalette.bPageBlock {
+        border-top: 0.5px solid  #eaeaea !important;
+        border-color: #eaeaea !important;
+        border-top-color: rgb(234, 234, 234);
+        }
+        
+        .headerRow .TableTitle {
+        color: #0d0d0d !important; 
+        text-align: center !important;
+        font-size:120% !important; 
+        font-weight:bold !important; 
+        }
+        
+        .slds-scope .slds-select_container::before { 
+        border-bottom: none;
+        }
+        
+        .slds-scope .slds-select_container::after { 
+        height: 7px;
+        width: 7px;
+        top: 15px;
+        }
+        
+        .slds-input{
+        color: #16325c;
+        border: 1px solid #bdbbb1 !important;
+        border-radius: .25rem;
+        text-align:left;
+        transition: border .1s linear,background-color .1s linear;
+        display: inline-block;
+        padding: 0 1rem 0 .75rem;
+        padding-right: 1.8rem;
+        }     
+        
+        A.url:visited{
+        color:purple;
+        text-decoration:none;
+        } 
+        
+    </style>
+    <script>
+    var j$ =jQuery.noConflict(); 
+    
+    //Función para que al cargar la página, no se haga autofoco en ningún elemento
+    window.onload= function(){
+        document.formPrincipal.prioridad.focus();
+    }
+    
+    //Función para abre el modal, tan pronto se carga la página, para mostrar la suma dinámica del total de los pesos
+    j$( document ).ready(function() {
+        j$('#Modal').addClass('slds-fade-in-open'); 
+    })
+    
+    //Función para ir a la parte superior de la página
+    function topLocation(){
+        window.scrollTo(0,0);
+    }
+    
+    //Método para abrir el modal de confirmación del reporte de Estándares Mínimos
+    function abrirModalEstandares(){
+        j$('#slds-backdrop1').addClass('slds-backdrop--open');
+        j$('#ModalEstandares').addClass('slds-fade-in-open'); 
+    } 
+    //Método para cerrar el modal de confirmación del reporte de Estándares Mínimos
+    function cerrarModalEstandares(){
+        j$('#ModalEstandares').removeClass('slds-fade-in-open');
+        j$('#slds-backdrop1').removeClass('slds-backdrop--open'); 
+    }
+
+    </script>
+    
+    <div class="slds-grid slds-text-align_center">
+        <div class="slds-col">
+            <br />
+            <div class="slds-text-heading_medium"><center><b>EVALUACIÓN ESTÁNDARES MÍNIMOS</b></center></div>
+            <br />
+        </div>
+       
+    </div>
+    <apex:form id="formPrincipal">
+        
+               
+        <apex:pageBlock >
+            <apex:outputPanel id="mensaje">
+                <c:SST_Mensajes_Page id="mensajeGlobal" listaMensajes="{!mensajesPaginaPrincipal}"/>
+            </apex:outputPanel>  
+            
+            <apex:outputPanel >    
+                <center><b><apex:commandButton id="guardarSuperior" action="{!guardarEvaluacionEstandar}" rerender="mensaje"   styleClass="slds-button slds-button_brand" value="Guardar" disabled="{!IF(botonActivo==true,false,true)}" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();"/></b>
+                    
+                    <apex:commandButton value="Generar PDF" onclick="abrirModalEstandares()" styleClass="slds-button slds-button_neutral" style="text-decoration:none" reRender="ModalEstandares2"/>
+                </center>
+                <br />               
+            </apex:outputPanel>
+            
+            <apex:pageBlockTable value="{!listaEstandares}" var="estandar"  border="1" >
+                <apex:column headerValue="CICLO" headerClass="TableTitle" styleClass="slds-text-align_center" style="text-align: left; vertical-align: middle;background:{!estandar.fondo};"  >
+                    <apex:outputText value="{!estandar.ciclo}" />
+                </apex:column>
+                <apex:column headerValue="ESTÁNDAR" headerClass="TableTitle"  styleClass="slds-text-align_center" style="text-align: left; vertical-align: middle;background:{!estandar.fondo};">
+                    <apex:outputText style="font-weight:bold;float: left;white-space: normal" value="{!estandar.estandarAgrupador}" />
+                </apex:column>
+                <apex:column headerValue="" headerClass="TableTitle" styleClass="slds-text-align_center" style="text-align: left; vertical-align: middle;background:{!estandar.fondo};" >
+                    <apex:outputText style="float: left;white-space: normal" value="{!estandar.estandar}" />
+                </apex:column>
+                <apex:column headerValue="ÍTEM" headerClass="TableTitle" styleClass="slds-text-align_center" style="text-align: left; vertical-align: middle;background:{!estandar.fondo};" >    
+                    <apex:outputLink title="Ir al detalle del ítem para adjuntar archivos" value="{!estandar.url}" 
+                                     target="_parent" style="float: left;white-space: normal">
+                        <apex:outputText style="float: left;white-space: normal" value="{!estandar.item}" />
+                    </apex:outputLink>
+                </apex:column>
+                <apex:column headerValue="CUMPLIMIENTO" headerClass="TableTitle"  styleClass="slds-text-align_center" style="text-align: left; vertical-align: middle;background:{!estandar.fondo};"
+                             title="Cuando se cumple con la actividad la calificación será la máxima asignada al respectivo ítem en la página de parametrización; si se cumple parcialmente la calificación será la mitad, de lo contrario su calificación será igual a cero (0).">
+                    <div  class="{!IF(estandar.item<>'','slds-select_container','none')}" rendered="{!estandar.item<>''}">
+                        <apex:selectList id="cumplimiento" value="{!estandar.cumplimiento}" styleClass="slds-select" size="1" required="true" rendered="{!IF(estandar.item<>'',true,false)}" style="border:1px solid #bdbbb1  !important;"                                      >
+                            <apex:selectOptions value="{!cumplimiento}"/>
+                            <apex:actionSupport event="onchange" reRender="formPrincipal,calificacionTotal" action="{!actualizarCalificacion}" onsubmit="showLoadingDialog();" oncomplete="hideLoadingDialog();" >                        
+                                <apex:param name="ciclo" value="{!estandar.cicloTemp}" assignTo="{!cicloActual}" />
+                                <apex:param name="estandarAgrupador" value="{!estandar.estandarAgrupadorTemp}" assignTo="{!estandarAgrupadorActual}"/>
+                                <apex:param name="estandar" value="{!estandar.estandarTemp}" assignTo="{!estandarActual}"/>
+                            </apex:actionSupport>
+                        </apex:selectList>
+                    </div>
+                </apex:column>
+                <apex:column id="columnJustificacion" headerClass="TableTitle" headerValue="JUSTIFICACIÓN" styleClass="slds-text-align_center" style="text-align: left; vertical-align: middle;background:{!estandar.fondo};">
+                    <apex:outputText id="justificacionO" value="{!estandar.Justificacion}" style="float: left;white-space: normal" rendered="{!IF(estandar.Cumplimiento<>noAplica,true,false)}"/>
+                    <apex:inputTextarea id="justificacionI" styleClass="slds-input" style="resize:vertical; height: 2.5em;overflow:hidden;" value="{!estandar.Justificacion}"  rendered="{!IF(estandar.Cumplimiento<>noAplica,false,true)}"
+                                        title="Si la actividad No Aplica, se deberá justificar la situación y se calificará con el porcentaje máximo parametrizado para la misma.  En caso de no justificarse, la calificación de la actividad será igual a cero (0).">
+                        <apex:actionSupport event="onchange" reRender="formPrincipal,calificacionTotal" action="{!actualizarCalificacion}"  onsubmit="showLoadingDialog();" oncomplete="hideLoadingDialog();" >                        
+                            <apex:param name="ciclo" value="{!estandar.cicloTemp}" assignTo="{!cicloActual}" />
+                            <apex:param name="estandarAgrupador" value="{!estandar.estandarAgrupadorTemp}" assignTo="{!estandarAgrupadorActual}"/>
+                            <apex:param name="estandar" value="{!estandar.estandarTemp}" assignTo="{!estandarActual}"/>
+                        </apex:actionSupport>
+                    </apex:inputTextarea>
+                    
+                </apex:column>
+                <apex:column id="columnCalificacion" headerValue="CALIFICACIÓN" headerClass="TableTitle" style="text-align: center; vertical-align: middle;background:{!IF((estandar.Cumplimiento==cumple || (estandar.Cumplimiento==noAplica && estandar.justificacion <>'')),colorCumple,IF(estandar.item == null,estandar.fondo,colorNoCumple))}">
+                    <apex:outputText id="calificacion1" value="{!IF((estandar.Cumplimiento==cumple || (estandar.Cumplimiento==noAplica && estandar.justificacion <>'')),estandar.puntaje,IF(estandar.item == null,estandar.calificacion,0))}%"/>
+                </apex:column>
+            </apex:pageBlockTable>
+            
+            <div class="slds-grid slds-gutters" id='total'>
+                <div class="slds-col slds-size_11-of-12 slds-text-align_center" style="color: #FFFFFF; background: rgb(34, 33, 53) none repeat scroll 0% 0%;">
+                    <apex:outputText style="font-weight:bold; font-size:18px !important; text-align: center; float: top" value="PUNTAJE TOTAL"/>
+                </div>
+                <div id="total2" class="slds-col slds-size_1-of-12 slds-text-align_left" style="color: #FFFFFF; background: rgb(34, 33, 53) none repeat scroll 0% 0%;">
+                    <apex:outputText id="total3" style="font-weight:bold; font-size:18px !important; text-align: left; float: top" value="{!total}%" />
+                </div>
+            </div>           
+            <br />           
+            
+            <apex:outputPanel >    
+                <center><b><apex:commandButton id="guardarInferior" action="{!guardarEvaluacionEstandar}"  rerender="mensaje" styleClass="slds-button slds-button_brand" value="Guardar" disabled="{!IF(botonActivo==true,false,true)}" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();topLocation();"/></b></center>
+            </apex:outputPanel>
+            
+        </apex:pageBlock>
+        
+        <!--Modal de confirmación para generar reporte de Estándares Mínimos-->
+        <section id="ModalEstandares" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal ">
+            <div id="ModalEstandares2" class="slds-modal__container">
+                <header id="headerModal" class="slds-modal__header">
+                    <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModalEstandares();">
+                        <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                           path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                        <span class="slds-assistive-text">Cerrar</span>
+                    </button>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="ModalEstandares3">
+                    
+                    <!--Bloque para la valoración -->
+                    
+                    <div class="slds-grid slds-grid_pull-padded-medium slds-grid_align-center">
+                        
+                        <!--Box con la valoración de estándares mínimos -->
+                        <div class="slds-col slds-p-horizontal_large slds-size_12-of-12">
+                            <fieldset class="slds-box slds-theme--default slds-container--large">
+                                <center><apex:outputText style="color: black; font-weight:bold; font-size:15px !important; font-family: sans-serif; text-align: center; float: top" value="VALORACIÓN"/></center>
+                                <br/>
+                                <!--Valoración que se renderiza si la calificación de estándares mínimos es inferior al 61% -->
+                                <apex:outputPanel rendered="{!IF(total <> null && total<61,'true','false')}">
+                                    <fieldset style="background-color:#CC0605"  class="slds-box slds-theme--default slds-container--large">
+                                        <center><apex:outputText style="color: black; font-weight:bold; font-size:18px !important; font-family: sans-serif; text-align: center; float: top" value="{!total}%  -  CRÍTICO"/></center>
+                                    </fieldset>
+                                </apex:outputPanel>
+                                
+                                <!--Valoración que se renderiza si la calificación de estándares mínimos está entre el 61% y el 86% -->
+                                <apex:outputPanel rendered="{!IF(total <> null && total>=61 && total<86,'true','false')}">
+                                    <fieldset style="background-color:#f7f71d"  class="slds-box slds-theme--default slds-container--large">
+                                        <center><apex:outputText style="color: black; font-weight:bold; font-size:18px !important; font-family: sans-serif; text-align: center; float: top" value="{!total}%  -  MODERADAMENTE ACEPTABLE"/></center>
+                                    </fieldset>
+                                </apex:outputPanel>
+                                
+                                <!--Valoración que se renderiza si la calificación de estándares mínimos es igual o superior al 86% -->
+                                <apex:outputPanel rendered="{!IF(total <> null && total>=86,'true','false')}">
+                                    <fieldset style="background-color:#317F43"  class="slds-box slds-theme--default slds-container--large">
+                                        <center><apex:outputText style="color: black; font-weight:bold; font-size:18px !important; font-family: sans-serif; text-align: center; float: top" value="{!total}%  -  Aceptable"/></center>
+                                    </fieldset>
+                                </apex:outputPanel>
+                            </fieldset>
+                        </div>
+                    </div>                      
+                    <br/>
+                    <!--Box con las acciones de estándares mínimos -->
+                    <div class="slds-grid slds-grid_pull-padded-medium slds-grid_align-center"> 
+                        <div class="slds-col slds-p-horizontal_large slds-size_12-of-12">
+                            <fieldset style="height: 225px !important" class="slds-box slds-theme--default slds-container--large">
+                                <center><apex:outputText style="color: black; font-weight:bold; font-size:15px !important; font-family: sans-serif; text-align: center; float: top" value="ACCIONES"/></center>
+                                
+                                <!--Bloque de acciones que se renderiza si la calificación de estándares mínimos es inferior al 61% -->
+                                <apex:outputPanel rendered="{!IF(total <> null && total<61,'true','false')}">
+                                    <fieldset style="border:none;color: black;" class="slds-box slds-theme--default slds-container--large">
+                                        <ul>
+                                            <li type="disc">Realizar y tener a disposición del Ministerio de Trabajo un plan de mejoramiento inmediato.</li>
+                                            <li type="disc">Enviar a la respectiva administradora de riesgos laborales a la que se encuentre afiliada la empresa o contratante, un reporte de avances en el término máximo de tres (3) meses después de realizada la autoevaluación de estándares mínimos.</li>
+                                            <li type="disc">Seguimiento anual y plan de visita a la empresa con valoración crítica, por parte del Ministerio de Trabajo.</li>
+                                        </ul>
+                                    </fieldset>
+                                </apex:outputPanel>
+                                
+                                <!--Bloque de acciones que se renderiza si la calificación de estándares mínimos está entre el 61% y el 86% -->
+                                <apex:outputPanel rendered="{!IF(total <> null && total>=61 && total<86,'true','false')}">
+                                    <fieldset style="border:none;color: black;" class="slds-box slds-theme--default slds-container--large">
+                                        <ul>
+                                            <li type="disc">Realizar y tener a disposición del Ministerio de Trabajo un plan de mejoramiento.</li>
+                                            <li type="disc">Enviar a la administradora de riesgos laborales un reporte de avances en el término máximo de seis (6) meses después de realizada la autoevaluación de estándares mínimos.</li>
+                                            <li type="disc">Plan de visita por parte del Ministerio de Trabajo.</li>
+                                        </ul>
+                                    </fieldset>
+                                </apex:outputPanel>
+                                
+                                <!--Bloque de acciones que se renderiza si la calificación de estándares mínimos es igual o superior al 86% -->
+                                <apex:outputPanel rendered="{!IF(total <> null && total>=86,'true','false')}">
+                                    <fieldset style="border:none;color: black;" class="slds-box slds-theme--default slds-container--large">
+                                        <ul>
+                                            <li type="disc">Mantener la calificación y evidencias a disposición del Ministerio de Trabajo, e incluir en el Plan anual de trabajo las mejoras detectadas.</li>
+                                        </ul>
+                                    </fieldset>
+                                </apex:outputPanel>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <br/>
+                    <center><apex:outputText value="Está a punto de generar el reporte de Estándares Mínimos.  Esta acción graba la evaluación del estándar y serán almacenados los datos de la calificación, fecha, hora y usuario actual." /></center>
+                    <br/>
+                    <center><b><apex:outputText value="¿Desea continuar?" /></b></center>
+                    <br/>
+                    <b><apex:outputText value="Comentarios:" /></b>
+                    <center><apex:inputTextarea styleClass="slds-input" id="comentariosEstandaresMinimos" style="width:100%; resize:vertical; height: 5em;" value="{!comentarios}"/></center>
+                    <br/>
+                    
+                </div>  
+                
+                
+      	         <footer class="slds-modal__footer">
+                    <button type="button" id='btnCerrar1' class="slds-button slds-button_neutral" data-dismiss="modal" onclick="cerrarModalEstandares();">Cancelar</button>
+                    <apex:CommandButton id="btnAceptar1" styleClass="slds-button slds-button_brand" value="Aceptar" action="{!generarReporteEstandaresMinimos}" reRender="mensajeGlobal"/>
+                </footer>
+     	     </div>
+        </section>
+		<div id="slds-backdrop1" class="slds-backdrop"></div>
+        
+        
+        <section id="Modal"  role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal"  style="height: 25px;width: 50px; top: 20px !important; left: 835px !important; border-radius: .25rem;">
+            <header class="slds-modal__header_empty">
+            </header>
+            <div class="slds-modal__content slds-p-around_medium" id="modalTotal" style=" background-color: rgb(0, 95, 178) !important; color: #FFFFFF !important; font-weight:bold !important;  padding:0 0 0 0 !important;width: 130px !important; min-height: calc(1.875rem + (1px * 2)); border-radius: .25rem;">
+                <center><apex:outputText value="PUNTAJE TOTAL:" /></center>
+                <center><apex:outputText id="calificacionTotal" value="{!total}" /></center>
+            </div>
+        </section>
+        <div id="slds-backdrop2" class="slds-backdrop"></div>
+        
+            </apex:form>
+    
+    
+</apex:page>

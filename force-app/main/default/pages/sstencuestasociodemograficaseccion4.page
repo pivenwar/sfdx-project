@@ -1,0 +1,449 @@
+<apex:page id="sstencuestasociodemograficaseccion4" showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false"
+           applyBodyTag="false" docType="html-5.0" lightningStylesheets="true" 
+           controller="SST_EncuestaSociodemograficaCC">
+    
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="es">
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <head> 
+            <meta charset="utf-8" />
+            <meta http-equiv="x-ua-compatible" content="ie=edge" />
+            <title>ENCUESTA</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            
+            <!-- Import the Design System style sheet -->
+            <apex:slds />
+            
+            <!-- Recurso estático para indicar que se está ejecutando una acción en la página -->
+            <c:SST_StatusLoading />
+        </head>
+        <body class="slds-scope">
+            
+            <apex:form styleClass="myForm5">
+                <!-- Bloque con la cuarta sección de la encuesta -->
+                <apex:pageBlock id="seccion4" >                     
+                    <b> 
+                        SECCION 4: CARACTERIZACIÓN FAMILIAR
+                    </b>
+                    <br /><br />
+                    <div class="slds-form slds-form_stacked" role="list">
+                        <p><b>
+                            Los datos de esta sección serán actualizados directamente al finalizar la encuesta:
+                            </b></p>
+                        <br />
+                        <CENTER><apex:outputText value="GRUPO FAMILIAR" style="font-weight:bold;font-size:1.1em"></apex:outputText></CENTER>
+                        <br />
+                        <div class="flex-container">
+                            <div class="slds-grid  slds-wrap slds-grid_align-spread">
+                                <div class="slds-col">
+                                    <apex:outputText style="width:100%;background-color:#ffffff;" value="Adicione un registro por cada miembro de su grupo familiar.  La primer subsección es obligatoria para cada uno; la segunda subsección aplica sólo si la persona sufre de discapacidad." />
+                                </div>
+                                <div class="slds-col">
+                                    <apex:commandLink title="Agregar" action="{!obtenerDatosFamiliar}" onclick="showLoadingDialog();" oncomplete="abrirModal();hideLoadingDialog();"
+                                                      reRender="formEvaluacion2,formEvaluacion3,mensajeModal2" styleClass="slds-button slds-button_neutral" style="font-weight:bold;font-size:1.1em;" >
+                                        <c:SST_ImagenesSVG styleClass="slds-button__icon slds-icon_xx-small" 
+                                                           path="/assets/icons/action-sprite/svg/symbols.svg#new" />
+                                        <span class="slds-assistive-text">Agregar</span>
+                                        <apex:param value="" assignTo="{!identifFamiliar}"/>
+                                        <apex:param value="" assignTo="{!idFamiliar}"/>
+                                        <apex:param value="" assignTo="{!nombreFamiliar}"/>
+                                    </apex:commandLink>
+                                </div>
+                            </div>                      
+                        </div>                                           
+                        <br />
+                        <apex:outputPanel id="familiares">    
+                            <div class="flex-container">
+                                <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                    <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--4-of-4">
+                                        <div class="slds-form-element__control">
+                                            <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal">
+                                                <thead>
+                                                    <tr class="slds-line-height_reset">
+                                                        <th class="slds-text-title_caps slds-text-align_center" scope="col">
+                                                            <div class="slds-truncate slds-text-align_center" title="Nombre">Nombre</div>
+                                                        </th>
+                                                        <th class="slds-text-title_caps slds-text-align_center" scope="col">
+                                                            <div class="slds-truncate slds-text-align_center" title="Parentesco">Parentesco</div>
+                                                        </th>
+                                                        <th class="slds-text-title_caps slds-text-align_center" scope="col">
+                                                            <div class="slds-truncate slds-text-align_center" title="Fecha Nacimiento">Fecha Nacimiento</div>
+                                                        </th>
+                                                        <th class="slds-text-title_caps slds-text-align_center" scope="col">
+                                                            <div class="slds-truncate slds-text-align_center" title="Tipo Documento">Tipo Documento</div>
+                                                        </th>
+                                                        <th class="slds-text-title_caps slds-text-align_center" scope="col">
+                                                            <div class="slds-truncate sslds-text-align_center" title="Identificación">Identificación</div>
+                                                        </th>
+                                                        <th class="slds-text-title_caps slds-text-align_center" scope="col">
+                                                            <div class="slds-truncate sslds-text-align_center" title="Archivo">Género</div>
+                                                        </th>
+                                                        <th class="slds-text-title_caps slds-text-align_center" scope="col">
+                                                            <div class="slds-truncate sslds-text-align_center" title="Archivo">Dependiente</div>
+                                                        </th>
+                                                        <th class="slds-text-title_caps slds-text-align_center" scope="col">
+                                                            <div class="slds-truncate sslds-text-align_center" title="Archivo">Discapacidad</div>
+                                                        </th>
+                                                        <th class="slds-text-title_caps" scope="col">
+                                                            <div class="slds-truncate" title="Acciones"/>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <apex:repeat first="0" rows="{!listaFamiliares.size}" var="fam" value="{!listaFamiliares}">
+                                                        <tr class="slds-hint-parent">
+                                                            <td data-label="Nombre" scope="row">
+                                                                <div class="slds-truncate" style="white-space:normal;width:100%" title="Nombre">{!fam.Nombre_completo__c}</div>
+                                                            </td>
+                                                            <td data-label="Parentesco" scope="row">
+                                                                <div class="slds-truncate slds-text-align_center" style="white-space:normal;width:100%" title="Parentesco">{!fam.Parentesco__c}</div>
+                                                            </td>
+                                                            <td data-label="Fecha Nacimiento">
+                                                                <center><apex:outputText value="{0, date, dd-MM-yyyy}">
+                                                                    <apex:param value="{!fam.Fecha_Nacimiento__c}" /> 
+                                                                    </apex:outputText></center>
+                                                            </td>
+                                                            <td data-label="Tipo Documento">
+                                                                <div class="slds-truncate slds-text-align_center" title="Tipo Documento">{!MapaTipoDoc[fam.Tipo_Documento__c]}</div>
+                                                            </td>
+                                                            <td data-label="Identificación">
+                                                                <div class="slds-truncate slds-text-align_center" style="white-space:normal;width:100%" title="Identificación">{!fam.Numero_Identificacion__c}</div>
+                                                            </td>
+                                                            <td data-label="Género">
+                                                                <div class="slds-truncate slds-text-align_center" style="white-space:normal;width:100%" title="Género">{!fam.Genero__c}</div>
+                                                            </td>
+                                                            <td data-label="Dependiente">
+                                                                <div class="slds-truncate slds-text-align_center" style="white-space:normal;width:100%" title="Depende Económicamente">{!IF(fam.Depende_economicamente__c==true,'SI','NO')}</div>
+                                                            </td>
+                                                            <td data-label="Discapacidad">
+                                                                <div class="slds-truncate slds-text-align_center" style="white-space:normal;width:100%" title="Discapacidad">{!fam.Discapacidad__c}</div>
+                                                            </td>
+                                                            <td class="slds-cell-shrink" data-label="Acciones">
+                                                                <apex:commandLink rendered="{!IF(fam.Nombre_completo__c=='',false,true)}" title="Modificar" action="{!obtenerDatosFamiliar}" onclick="showLoadingDialog();" oncomplete="javascript:abrirModal();hideLoadingDialog();"
+                                                                                  reRender="formEvaluacion2,formEvaluacion3" styleClass="slds-icon_container slds-icon-utility-delete" style="text-decoration:none;border:none" >
+                                                                    <c:SST_ImagenesSVG styleClass="slds-icon slds-icon-text-default slds-icon_x-small" 
+                                                                                       path="/assets/icons/utility-sprite/svg/symbols.svg#edit" />
+                                                                    <span class="slds-assistive-text">Modificar</span>
+                                                                    <apex:param value="{!fam.Numero_Identificacion__c}" assignTo="{!identifFamiliar}"  name="identifFamiliar"/>
+                                                                    <apex:param value="{!fam.Nombre_completo__c}" assignTo="{!nombreFamiliar}" name="nombreFamiliar" />
+                                                                    <apex:param value="{!fam.id}" assignTo="{!idFamiliar}" name="idFamiliar"/>
+                                                                </apex:commandLink>
+                                                                <apex:commandLink rendered="{!IF(fam.Nombre_completo__c=='',false,true)}" title="Remover" action="{!removerFamiliar}" onclick="showLoadingDialog();" oncomplete="javascript:abrirModalConfirmacion();hideLoadingDialog();"
+                                                                                  reRender="mensajeConfirmacion,modal-confirmacion-heading-04" styleClass="slds-icon_container slds-icon-utility-delete" style="text-decoration:none;border:none" >
+                                                                    <c:SST_ImagenesSVG styleClass="slds-icon slds-icon-text-default slds-icon_x-small" 
+                                                                                       path="/assets/icons/utility-sprite/svg/symbols.svg#delete" />
+                                                                    <span class="slds-assistive-text">Remover</span>
+                                                                    <apex:param value="{!fam.Numero_Identificacion__c}" assignTo="{!identifFamiliar}" name="identifFamiliar"/>
+                                                                    <apex:param value="{!fam.Nombre_completo__c}" assignTo="{!nombreFamiliar}" name="nombreFamiliar" />
+                                                                    <apex:param value="{!fam.id}" assignTo="{!idFamiliar}" name="idFamiliar"/>
+                                                                </apex:commandLink>
+                                                            </td>
+                                                        </tr>
+                                                    </apex:repeat> 
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> 
+                        </apex:outputPanel>
+                        <br />
+                    </div>
+                    <br />
+                    <div class="flex-container" >
+                        <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--4-of-4 slds-text-align_right">
+                                <button type="button" style="width:8%" target="_self" class="slds-button slds-button_neutral" onclick="devolver('4');"  >Atrás</button>
+                                <button type="button" target="_self" class="slds-button slds-button_brand" onclick="topLocation('4');"  >Siguiente</button>
+                            </div>
+                            <apex:actionFunction action="{!irAdelante}" onbeforedomupdate="hideLoadingDialog();" reRender="mensajeGlobal,secciones" name="irSeccion5" />
+                            <apex:actionFunction action="{!irAtras}" onbeforedomupdate="hideLoadingDialog();" reRender="secciones" name="irAtras3" />
+                        </div>
+                    </div>
+                </apex:pageBlock> 
+                
+            
+            <!--Modal para agregar o modificar datos de los miembros del grupo familiar-->
+            <apex:outputPanel id="formModal">
+                <section id="Modal" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+                    <div id="Modal2" class="slds-modal__container">
+                        <header id="headerModal" class="slds-modal__header">
+                            <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModal();">
+                                <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                   path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                <span class="slds-assistive-text">Cerrar</span>
+                            </button>
+                            <apex:outputText id="modal-heading-03" style="font-weight: 300; float: center;white-space: normal; font-size: 1.1rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="Datos del miembro del grupo familiar"/>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium" id="Modal3">
+                            <apex:pageBlock id="formEvaluacion2" >
+                                <br/>
+                                <center><apex:outputText style="font-weight: bold; float: center;white-space: normal; font-size: 0.9em; color: #000; font-family:'Salesforce Sans',Arial,sans-serif;" value="Subsección 1: Datos personales del familiar"/><br/>
+                                <apex:outputText style="float: center;white-space: normal; font-size: 0.9em; color: #000; font-family:'Salesforce Sans',Arial,sans-serif;" value="Todos los datos de esta subsección son obligatorios"/></center>
+                                <br/>   
+                                <div class="slds-form slds-form_stacked" role="list">
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                <span title="Requerido" class="slds-form-element__label">Nombres y Apellidos</span>
+                                                <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField id="input-40-1" styleClass="slds-input-hbt" style="width:100%;background-color:#ffffff;" value="{!familiar.Nombre_completo__c}" html-onpaste="return false" onkeypress="return inputLimiter(event,'Letters');" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                <span title="Requerido" class="slds-form-element__label">Parentesco</span>
+                                                <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-select_container" >
+                                                        <apex:selectList id="input-41-1" required="true" value="{!familiar.Parentesco__c}" multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">
+                                                            <apex:selectOptions id="input-select-41-1" value="{!parentesco}"/>
+                                                        </apex:selectList> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                <span title="Requerido" class="slds-form-element__label">Fecha de Nacimiento</span>
+                                                <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                                <div class="slds-form-element__control">
+                                                    <apex:input id="input-42-1" title="Formato DD-MM-AAAA" styleClass="slds-input" type="date" html-max="{!fechaMax}" style="width:100%;background-color:#ffffff;" value="{!fechaNacFamiliar}" html-onpaste="return false"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                <span title="Requerido" class="slds-form-element__label">Tipo de documento</span>
+                                                <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-select_container" >
+                                                        <apex:selectList id="input-43-1" required="true" value="{!familiar.Tipo_Documento__c}" multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">
+                                                            <apex:selectOptions id="input-select-43-1" value="{!tipoDoc}"/>
+                                                        </apex:selectList> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>                                        
+                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                <span title="Requerido" class="slds-form-element__label">Número de identificación</span>
+                                                <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField id="input-44-1" styleClass="slds-input" style="width:100%;background-color:#ffffff;" value="{!familiar.Numero_Identificacion__c}" html-onpaste="return false" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers');"/>
+                                                </div>
+                                            </div>
+                                        </div>                                            
+                                    </div>
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                <span title="Requerido" class="slds-form-element__label">Género</span>
+                                                <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-select_container" >
+                                                        <apex:selectList id="input-45-1" value="{!familiar.Genero__c}"  multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">
+                                                            <apex:selectOption id="input-select1-45-1" itemValue="-- Seleccione --" itemLabel="-- Seleccione --" />
+                                                            <apex:selectOption id="input-select2-45-1" itemValue="FEMENINO" itemLabel="FEMENINO" />
+                                                            <apex:selectOption id="input-select3-45-1" itemValue="MASCULINO" itemLabel="MASCULINO" />
+                                                            <apex:selectOption id="input-select4-45-1" itemValue="OTRO" itemLabel="OTRO" />
+                                                        </apex:selectList> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                <span title="Requerido" class="slds-form-element__label">¿Depende económicamente de usted?</span>
+                                                <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-select_container" >
+                                                        <apex:selectList id="input-46-1" value="{!familiarDependiente}"  multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">
+                                                            <apex:selectOption id="input-select1-46-1" itemValue="-- Seleccione --" itemLabel="-- Seleccione --" />
+                                                            <apex:selectOption id="input-select2-46-1" itemValue="NO" itemLabel="NO" />
+                                                            <apex:selectOption id="input-select3-46-1" itemValue="SI" itemLabel="SI" />
+                                                        </apex:selectList> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>                          
+                            </apex:pageBlock>
+                            <apex:outputPanel id="mensajeModal1">
+                                <c:SST_Mensajes_Page id="mensajeModal2" listaMensajes="{!mensajesModal}"/>
+                            </apex:outputPanel> 
+                            <apex:pageBlock id="formEvaluacion3" >
+                                <br/>   
+                                <center><apex:outputText style="font-weight: bold; float: center;white-space: normal; font-size: 0.9em; color: #000; font-family:'Salesforce Sans',Arial,sans-serif;" value="Subsección 2: Discapacidad del familiar"/><br/>
+                                <apex:outputText style="float: center;white-space: normal; font-size: 0.9em; color: #000; font-family:'Salesforce Sans',Arial,sans-serif;" value="La pregunta 1 es obligatoria; si su respuesta es afirmativa, conteste los numerales 2 a 6; si diligencia la casilla 6, conteste los numerales 7 y 8"/></center>
+                                <br/>   
+                                <div class="slds-form slds-form_stacked" role="list">
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                <span title="Requerido" class="slds-form-element__label">1. ¿Padece algún tipo de discapacidad?</span>
+                                                <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-select_container" >
+                                                        <apex:selectList id="input-47-1" value="{!familiar.Discapacidad__c}"  multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">
+                                                            <apex:selectOption id="input-select1-47-1" itemValue="-- Seleccione --" itemLabel="-- Seleccione --" />
+                                                            <apex:selectOption id="input-select2-47-1" itemValue="NO" itemLabel="NO" />
+                                                            <apex:selectOption id="input-select3-47-1" itemValue="SI" itemLabel="SI" />
+                                                        </apex:selectList> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                <span class="slds-form-element__label">2. ¿Está a su cargo legalmente?</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-select_container" >
+                                                        <apex:selectList id="input-48-1" value="{!familiar.Representante_legal__c}"  multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">
+                                                            <apex:selectOption id="input-select1-48-1" itemValue="-- Seleccione --" itemLabel="-- Seleccione --" />
+                                                            <apex:selectOption id="input-select2-48-1" itemValue="NO" itemLabel="NO" />
+                                                            <apex:selectOption id="input-select3-48-1" itemValue="SI" itemLabel="SI" />
+                                                        </apex:selectList> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                <span class="slds-form-element__label">3. ¿Trabaja o ha trabajado?</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-select_container" >
+                                                        <apex:selectList id="input-49-1" value="{!familiar.trabajo__c}"  multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">
+                                                            <apex:selectOption id="input-select1-49-1" itemValue="-- Seleccione --" itemLabel="-- Seleccione --" />
+                                                            <apex:selectOption id="input-select2-49-1" itemValue="NO" itemLabel="NO" />
+                                                            <apex:selectOption id="input-select3-49-1" itemValue="SI" itemLabel="SI" />
+                                                        </apex:selectList> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>     
+                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                <span class="slds-form-element__label">4. ¿Cuál es su nivel de escolaridad?</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-select_container" >
+                                                        <apex:selectList id="input-50-1" required="true" value="{!familiar.Escolaridad__c}" multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">
+                                                            <apex:selectOptions id="input-select-50-1" value="{!escolaridad}"/>
+                                                        </apex:selectList> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>  
+                                    </div>
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                <span class="slds-form-element__label">5. ¿Qué tipo(s) de discapacidad(es) padece?</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-form slds-form_compound">
+                                                        <div class="slds-form-element__row">
+                                                            <div class="slds-form-element slds-size_1-of-1">
+                                                                <div class="slds">
+                                                                    <div class="slds-form-element">
+                                                                        <apex:outputPanel id="seccionUsuarios3">
+                                                                            <c:SST_MultiselectPicklist leftLabel="Disponibles"
+                                                                                                       left="{!discapacidadFamiliarDisp}"
+                                                                                                       rightLabel="Seleccionados"
+                                                                                                       right="{!discapacidadFamiliarSelec}"
+                                                                                                       size="4"
+                                                                                                       width="100%" height="90px"/>
+                                                                        </apex:outputPanel>
+                                                                    </div>
+                                                                </div>                                  
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>                                            
+                                    </div>
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                <span class="slds-form-element__label">6. Si actualmente es o ha sido beneficiario de un programa del gobierno por su discapacidad, indique el nombre, en caso contrario deje la casilla en blanco</span>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField id="input-51-1" styleClass="slds-input-hbt" style="width:100%;background-color:#ffffff;" value="{!familiar.Programa_gubernamental__c}" html-onpaste="return false" onkeypress="return inputLimiter(event,'Letters');" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                <span class="slds-form-element__label">7. Fecha de inicio del beneficio recibido</span>
+                                                <div class="slds-form-element__control">
+                                                    <apex:input id="input-52-1" title="Formato DD-MM-AAAA" styleClass="slds-input" type="date" html-max="{!fechaMax}" style="width:100%;background-color:#ffffff;" value="{!inicioBeneficioFamiliar}" html-onpaste="return false"/>
+                                                </div>
+                                            </div>
+                                        </div>                                                                                    
+                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                <span class="slds-form-element__label">8. Fecha de fin  del beneficio recibido</span>
+                                                <div class="slds-form-element__control">
+                                                    <apex:input id="input-53-1" title="Formato DD-MM-AAAA" styleClass="slds-input" type="date" html-max="{!fechaMax}" style="width:100%;background-color:#ffffff;" value="{!finBeneficioFamiliar}" html-onpaste="return false"/>
+                                                </div>
+                                            </div>
+                                        </div>  
+                                    </div>
+                                </div>
+                                <br/>
+                                <center><apex:outputText style="font-weight: bold;float: center;white-space: normal; font-size: 0.9em; color: #000; font-family:'Salesforce Sans',Arial,sans-serif;" value="NOTA: Si el beneficio recibido se encuentra en curso, deje la fecha de fin en blanco"/></center>
+                            </apex:pageBlock>
+                            <br/> 
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <button type="button" id='btnCerrar2' class="slds-button slds-button_neutral" data-dismiss="modal" onclick="cerrarModal();">Cancelar</button>
+                            <button type="button" class="slds-button slds-button_brand" onclick="validarModal();">Agregar</button>
+                        </footer>
+                        <apex:actionFunction action="{!agregarFamiliar}" name="agregarFamiliar" oncomplete="if({!mensajesModal.size<=0})cerrarModal();" onbeforedomupdate="hideLoadingDialog();" reRender="mensajeModal2,familiares,input-40-1,input-44-1"/>
+                    </div>
+                </section>
+                <div id="slds-backdrop" class="slds-backdrop"></div>
+            </apex:outputPanel>
+            
+            <!--Modal para confirmar si se desea remover un miembro del grupo familiar-->
+            <apex:outputPanel id="formModalConfirmacion">
+                <section id="ModalConfirmacion" role="dialog" tabindex="-1" aria-labelledby="modal-confirmacion-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+                    <div id="ModalConfirmacion2" class="slds-modal__container">
+                        <header id="headerModal" class="slds-modal__header">
+                            <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModalConfirmacion();">
+                                <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                   path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                <span class="slds-assistive-text">Cerrar</span>
+                            </button>
+                            <apex:outputText id="modal-confirmacion-heading-03" style="font-weight: 300; float: center;white-space: normal; font-size: 1.1rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="Remover miembro del grupo familiar"/>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium" id="ModalConfirmacion3">
+                            <apex:outputPanel id="mensajeConfirmacion">
+                                <center><apex:outputText id="modal-confirmacion-heading-04" style="font-weight: 300; float: center;white-space: normal; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="La persona con nombre {!nombreFamiliar} será removida de la lista de miembros de su grupo familiar."/><br />
+                                <apex:outputText id="modal-confirmacion-heading-05" style="font-weight: bold; float: center;white-space: normal; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="¿Desea continuar?"/></center>
+                            </apex:outputPanel> 
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <button type="button" id='btnCerrar2' class="slds-button slds-button_neutral" data-dismiss="modal" onclick="cerrarModalConfirmacion();">Cancelar</button>
+                            <button type="button" id="btnAceptar2" class="slds-button slds-button_brand"  data-dismiss="modal" onclick="removerFamiliar();showLoadingDialog();" >Aceptar</button>
+                        </footer>
+                        <apex:actionFunction action="{!removerFamiliar}" name="removerFamiliar" reRender="familiares,mensajeGlobal" oncomplete="cerrarModalConfirmacion();" onbeforedomupdate="hideLoadingDialog();"/>
+                    </div>
+                </section>
+                <div id="slds-backdrop-confirmacion" class="slds-backdrop"></div>
+            </apex:outputPanel>
+            </apex:form>
+        </body>
+    </html>
+    
+</apex:page>

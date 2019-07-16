@@ -1,0 +1,225 @@
+<apex:page id="sstencuestasociodemograficaseccion3" showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false"
+           applyBodyTag="false" docType="html-5.0" lightningStylesheets="true" 
+           controller="SST_EncuestaSociodemograficaCC">
+
+     <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="es">
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <head> 
+            <meta charset="utf-8" />
+            <meta http-equiv="x-ua-compatible" content="ie=edge" />
+            <title>ENCUESTA</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            
+            <!-- Import the Design System style sheet -->
+            <apex:slds />
+            
+            <!-- Recurso estático para indicar que se está ejecutando una acción en la página -->
+            <c:SST_StatusLoading />
+        </head>
+       
+        <body class="slds-scope">
+            <apex:form styleClass="myForm4">
+                <!-- Bloque con la tercera sección de la encuesta -->
+                <apex:pageBlock id="seccion3" >                     
+                    <b> 
+                        SECCION 3: CARACTERIZACIÓN PERSONAL Y DE DISCAPACIDAD
+                    </b>
+                    <br /><br />
+                    <div class="slds-form slds-form_stacked" role="list">
+                        <p><b>
+                            Los datos de esta sección serán actualizados directamente al finalizar la encuesta:
+                            </b></p>
+                        <br />
+                        <div class="slds-grid slds-gutters_small">
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">1. {!$ObjectType.SST_Informacion_sociodemografica__c.fields.Personas_a_cargo__c.inlineHelpText}:</span>
+                                    <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                    <div class="slds-form-element__control">
+                                        <div id="input-35" class="slds-select_container">
+                                            <apex:selectList id="input-35-1" value="{!infoContacto.Personas_a_cargo__c}" multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">                                                                                    
+                                                <apex:selectOptions id="input-select-35-1" value="{!psnasACargo}"/>
+                                            </apex:selectList> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">2. {!$ObjectType.SST_Informacion_sociodemografica__c.fields.Cabeza_de_hogar__c.inlineHelpText}</span>
+                                    <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                    <div class="slds-form-element__control">
+                                        <div id="input-36" class="slds-select_container">
+                                            <apex:selectList id="input-36-1" value="{!infoContacto.Cabeza_de_hogar__c}" multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">                                                                                    
+                                                <apex:selectOption id="input-select1-36-1" itemValue="-- Seleccione --" itemLabel="-- Seleccione --" />
+                                                <apex:selectOption id="input-select2-36-1" itemValue="NO" itemLabel="NO" />
+                                                <apex:selectOption id="input-select3-36-1" itemValue="SI" itemLabel="SI" />
+                                            </apex:selectList> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br /><br />
+                        <p><b>
+                            Por favor conteste las preguntas 3 y 4 de acuerdo a la convención sobre los derechos de las personas con discapacidad que emitió la Naciones Unidas:
+                            </b>
+                            <br />
+                            <i>"La discapacidad es un concepto que evoluciona y que resulta de la interacción entre las personas con deficiencias y las barreras debidas a la actitud y al entorno [...] Las personas con discapacidad incluyen a aquellas personas que tengan deficiencias físicas, mentales, intelectuales o sensoriales a largo plazo que al interactuar con diversas  barreras puedan impedir su participación plena y efectiva en la sociedad en igualdad de condiciones con las demás"</i>
+                        </p>
+                        <br />
+                        <div class="slds-grid slds-gutters_small">
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">3. {!$ObjectType.SST_Informacion_sociodemografica__c.fields.Discapacidad__c.inlineHelpText}</span>
+                                    <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                    <div class="slds-form-element__control">
+                                        <div id="input-34" class="slds-select_container">
+                                            <apex:selectList id="input-34-1" value="{!infoContacto.Discapacidad__c}" multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">                                                                                    
+                                                <apex:selectOption id="input-select1-34-1" itemValue="-- Seleccione --" itemLabel="-- Seleccione --" />
+                                                <apex:selectOption id="input-select2-34-1" itemValue="NO" itemLabel="NO" />
+                                                <apex:selectOption id="input-select3-34-1" itemValue="SI" itemLabel="SI" />
+                                            </apex:selectList> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">4. {!$ObjectType.SST_Informacion_sociodemografica__c.fields.Tratamiento_discapacidad__c.inlineHelpText}</span>
+                                    <div class="slds-form-element__control">
+                                        <div id="input-37" class="slds-select_container">
+                                            <apex:selectList id="input-37-1" value="{!infoContacto.Tratamiento_discapacidad__c}" multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">                                                                                    
+                                                <apex:selectOption id="input-select1-37-1" itemValue="-- Seleccione --" itemLabel="-- Seleccione --" />
+                                                <apex:selectOption id="input-select2-37-1" itemValue="NO" itemLabel="NO" />
+                                                <apex:selectOption id="input-select3-37-1" itemValue="SI" itemLabel="SI" />
+                                            </apex:selectList> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br /><br />
+                        <p><b>
+                            Si respondió en forma afirmativa en la pregunta 3, por favor conteste las preguntas 5 a 8:
+                            </b></p>
+                        <br />
+                        <div class="slds-grid slds-gutters_small">
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">5. {!$ObjectType.SST_Informacion_sociodemografica__c.fields.Tipo_discapacidad__c.inlineHelpText}:</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form slds-form_compound">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size_1-of-1">
+                                                    <div class="slds">
+                                                        <div class="slds-form-element">
+                                                            <apex:outputPanel id="seccionDiscapacidad1">
+                                                                <c:SST_MultiselectPicklist leftLabel="Disponibles"
+                                                                                           left="{!tiposDiscapacidadDisponibles}"
+                                                                                           rightLabel="Seleccionados"
+                                                                                           right="{!tiposDiscapacidadSeleccionados}"
+                                                                                           size="5"
+                                                                                           width="100%" height="100px"/>
+                                                            </apex:outputPanel>
+                                                        </div>
+                                                    </div>                                  
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">6. {!$ObjectType.SST_Informacion_sociodemografica__c.fields.Origen_discapacidad__c.inlineHelpText}:</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form slds-form_compound">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size_1-of-1">
+                                                    <div class="slds">
+                                                        <div class="slds-form-element">
+                                                            <apex:outputPanel id="seccionDiscapacidad2">
+                                                                <c:SST_MultiselectPicklist leftLabel="Disponibles"
+                                                                                           left="{!origenesDiscapacidadDisponibles}"
+                                                                                           rightLabel="Seleccionados"
+                                                                                           right="{!origenesDiscapacidadSeleccionados}"
+                                                                                           size="5"
+                                                                                           width="100%" height="100px"/>
+                                                            </apex:outputPanel>
+                                                        </div>
+                                                    </div>                                  
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="slds-grid slds-gutters_small">
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">7. {!$ObjectType.SST_Informacion_sociodemografica__c.fields.Discapacidad_certificada__c.inlineHelpText}</span>
+                                    <div class="slds-form-element__control">
+                                        <div id="input-38" class="slds-select_container">
+                                            <apex:selectList id="input-38-1" value="{!infoContacto.Discapacidad_certificada__c}" multiselect="false" styleClass="slds-select" size="1" style="height: 5px !important; border:1px solid rgb(221, 219, 218) !important;">                                                                                    
+                                                <apex:selectOption id="input-select1-38-1" itemValue="-- Seleccione --" itemLabel="-- Seleccione --" />
+                                                <apex:selectOption id="input-select2-38-1" itemValue="NO" itemLabel="NO" />
+                                                <apex:selectOption id="input-select3-38-1" itemValue="SI" itemLabel="SI" />
+                                            </apex:selectList> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">8. {!$ObjectType.SST_Informacion_sociodemografica__c.fields.Porcentaje_discapacidad__c.inlineHelpText}</span>
+                                    <div class="slds-form-element__control">
+                                        <apex:inputField id="input-39-1" styleClass="slds-input" style="width:100%;background-color:#ffffff;" value="{!infoContacto.Porcentaje_discapacidad__c}" onkeypress="return inputLimiter(event,'Numbers');" html-onpaste="return false" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br /><br />
+                    <apex:outputPanel rendered="{!listaFamiliares.size==0}">
+                            <div class="flex-container" >
+                                <div class="slds-grid slds-wrap slds-align_absolute-center">
+                                    <b>
+                                        Indique si desea o no registrar miembros de su grupo familiar para ser dirigido a la sección respectiva.
+                                        <br />
+                                        Si selecciona SI, será dirigido a la sección 4; si selecciona NO, será dirigido a la sección 5.
+                                        <br /><br />
+                                    </b> 
+                                    <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--4-of-4">
+                                        <div class="slds-text-align_center slds-text-longformslds-form-element__control">
+                                            <div class="slds-form-element__control slds-align_absolute-center">
+                                                <apex:selectRadio value="{!contacto.tieneFamiliares}">
+                                                    <apex:selectOption id="SI" itemValue="SI" itemLabel="SI" /><br />
+                                                    <apex:selectOption id="NO" itemValue="NO" itemLabel="NO" />
+                                                </apex:selectRadio>
+                                            </div> 
+                                        </div>
+                                    </div>
+                                </div> 
+                            </div> 
+                            <br />
+                        </apex:outputPanel> 
+                    <div class="flex-container" >
+                        <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--4-of-4 slds-text-align_right">
+                                <button type="button" target="_self" class="slds-button slds-button_neutral"  onclick="devolver('3');"  >Atrás</button>
+                                <button type="button" target="_self" class="slds-button slds-button_brand" onclick="validarSeccion('3');"  >Siguiente</button>
+                            </div>
+                            <apex:actionFunction action="{!irAdelante}" onbeforedomupdate="hideLoadingDialog();" reRender="mensajeGlobal,secciones" name="irSeccion4" />
+                            <apex:actionFunction action="{!irAtras}" onbeforedomupdate="hideLoadingDialog();" reRender="secciones" name="irAtras2" />
+                        </div>
+                    </div>
+                </apex:pageBlock> 
+           </apex:form>
+        </body>
+    </html>
+    
+</apex:page>

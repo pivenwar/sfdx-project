@@ -1,0 +1,3 @@
+<apex:page docType="html-5.0" lightningStylesheets="true"   controller="SST_GeneradorReportesCC">
+   
+</apex:page>

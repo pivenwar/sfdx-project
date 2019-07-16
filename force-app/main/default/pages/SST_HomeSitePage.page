@@ -1,0 +1,140 @@
+<apex:page showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false"
+           applyBodyTag="false" docType="html-5.0" lightningStylesheets="true" controller="SST_HomeSiteCC">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="es">
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <head>
+            <meta charset="utf-8" />
+            <meta http-equiv="x-ua-compatible" content="ie=edge" />
+            <title>DOCUMENTACIÓN</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            
+            <!-- Import the Design System style sheet -->
+            <apex:slds />
+            
+            <!-- Recurso estático para indicar que se está ejecutando una acción en la página -->
+            <c:SST_StatusLoading />
+        </head>
+        <body class="slds-scope">
+            <!--form principal-->
+            <apex:form styleClass="myForm">
+                <div class="slds-scope">
+                    <div class="flex-container" >
+                        <div class="slds-grid slds-wrap slds-align_absolute-center">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                <div class="slds-text-align_center slds-form-element__control">
+                                    <apex:image style="width:70%" url="{!URLFOR($Resource.SST_logo_empresa, '/LogoHorizontal.jpg')}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                    <br /><br /><br />
+                    <div class="flex-container" >
+                        <div class="slds-grid slds-wrap slds-align_absolute-center">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--2-of-4">
+                                <div class="slds-text-align_center slds-form-element__control">
+                                    <apex:outputText id="text-input-028" style="color:black;font-weight:bold;font-size:1.3em;width:100%;background-color:#ffffff" value="HOME SITE SST" />
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                    <br /><br /><br />
+                    <div class="flex-container" >
+                        <div class="slds-grid slds-wrap slds-align_absolute-center">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                <div class="slds-text-align_center slds-form-element__control">
+                                    <apex:outputText value="BIENVENIDO" style="font-weight:bold;font-size:1.3em"></apex:outputText>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                    <br /><br /><br />
+                    <div class="flex-container" >
+                        <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                <apex:outputPanel >
+                                    <fieldset class="slds-box slds-theme--default slds-container--large">  
+                                        <legend class="slds-text-heading--medium slds-p-vertical--medium">
+                                            <div class="slds-p-horizontal--small slds-size--1-of-1 slds-m-top--medium">
+                                                <h3 class="slds-text-heading--small slds-m-bottom--medium"><b>Comunicaciones</b></h3>
+                                            </div>
+                                        </legend>
+                                        <center>
+                                            <p>
+                                                Módulo para el reporte de accidentes, incidentes, actos o condiciones inseguras y otros
+                                                <br /> <br />
+                                            </p>
+                                            <apex:outputLink value="{!comunicaciones}" 
+                                                             target="_self" styleClass="slds-button slds-button_neutral" style="text-decoration:none">
+                                                Ir al módulo
+                                            </apex:outputLink>
+                                        </center>
+                                    </fieldset>
+                                    
+                                </apex:outputPanel>
+                            </div>
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                <apex:outputPanel >
+                                    <fieldset class="slds-box slds-theme--default slds-container--large">  
+                                        <legend class="slds-text-heading--medium slds-p-vertical--medium">
+                                            <div class="slds-p-horizontal--small slds-size--1-of-1 slds-m-top--medium">
+                                                <h3 class="slds-text-heading--small slds-m-bottom--medium"><b>Gestión Documental</b></h3>
+                                            </div>
+                                        </legend>
+                                        <center>
+                                            <p>
+                                                Módulo para la gestión de los documentos solicitados a contratistas y proveedores para su evaluación
+                                                <br /> <br />
+                                            </p>
+                                            <apex:outputLink value="{!gestionDocumental}" 
+                                                             target="_self" styleClass="slds-button slds-button_neutral" style="text-decoration:none">
+                                                Ir al módulo
+                                            </apex:outputLink>
+                                        </center>
+                                    </fieldset>
+                                    
+                                </apex:outputPanel>
+                            </div>
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                <apex:outputPanel >
+                                    <fieldset class="slds-box slds-theme--default slds-container--large">  
+                                        <legend class="slds-text-heading--medium slds-p-vertical--medium">
+                                            <div class="slds-p-horizontal--small slds-size--1-of-1 slds-m-top--medium">
+                                                <h3 class="slds-text-heading--small slds-m-bottom--medium"><b>Encuesta Sociodemográfica</b></h3>
+                                            </div>
+                                        </legend>
+                                        <center>
+                                            <p>
+                                                Módulo para el diligenciamiento de la encuestra sociodemográfica de los funcionarios de la empresa
+                                                <br /> <br />
+                                            </p>
+                                            <apex:outputLink value="{!encuestaSociodemografica}" 
+                                                             target="_self" styleClass="slds-button slds-button_neutral" style="text-decoration:none">
+                                                Ir al módulo
+                                            </apex:outputLink>
+                                        </center>
+                                    </fieldset>
+                                    
+                                </apex:outputPanel>
+                            </div>
+                        </div>
+                    </div> 
+                    <br /><br /><br />
+                    <div class="flex-container">
+                        <div class="slds-grid slds-wrap slds-align_absolute-center">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--1-of-4 slds-text-align_center slds-vertical-align-end">
+                                <apex:outputLink title="Ir a la Comunidad SST" value="{!linkSST}" target="_blank">
+                                    <apex:image style="width:35%" url="{!URLFOR($Resource.LogoModuloComunicaciones, '/LOGO_SST_BLUE.png')}"/> 
+                                </apex:outputLink>
+                                <apex:outputLink title="Ir al portal de Heinsohn Business Technology" value="https://www.heinsohn.com.co" target="_blank">
+                                    <apex:image style="width:65%" url="{!URLFOR($Resource.LogoModuloComunicaciones, '/poweredHBT.JPG')}"/>
+                                </apex:outputLink>
+                            </div>
+                        </div>
+                    </div>                       
+                </div>
+            </apex:form>
+        </body>
+        
+    </html>
+</apex:page>

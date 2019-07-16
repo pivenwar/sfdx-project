@@ -1,0 +1,270 @@
+<apex:page showHeader="false" controller="SST_Estatus1072CC" renderAs="pdf" applyBodyTag="false" applyHtmlTag="false" title="Estatus de implementación"
+           standardStylesheets="false" lightningStylesheets="false"  >
+    
+    <head>
+        <style type="text/css" media="print">           
+            @page {                
+            @bottom-left {
+            content: element(footer);
+            }
+            }
+            
+            div.content {
+            padding-top: 130px;
+            }
+            
+            div.footer {
+            display: block;
+            padding: 5px;
+            position: running(footer);
+            font-family:sans-serif;
+            font-size: 13px;
+            }
+            
+            div.subfooter {
+            display: inline-block;
+            font-family:sans-serif;
+            font-size: 13px;
+            }
+            
+            div.right {
+            float: right;
+            }
+            
+            .pagenumber:before {
+            content: counter(page);
+            }
+            
+            .pagecount:before {
+            content: counter(pages);
+            }
+            
+            .withoutLineTitle {
+            border-width: 0px 0px 0px 0px;
+            font-family:sans-serif;
+            font-size: 13px;
+            font-weight:bold;
+            text-align:center;
+            }
+            
+            .withoutLine {
+            border-width: 0px 0px 0px 0px;
+            }
+            
+            
+            td,th{
+            border:0.5px solid black;
+            padding: 7px;
+            word-wrap: break-word;
+            }
+            
+            table tr, table td{
+            page-break-inside: avoid;
+            }
+            
+            table{
+            -fs-table-paginate: paginate;
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            font-family:sans-serif;
+            }
+            .titulo{
+            font-family:sans-serif;
+            font-size: 13px;
+            font-weight:bold;
+            text-align:center;
+            }
+            .subtitulo{
+            font-family:sans-serif;
+            font-size: 13px;
+            }
+            .tituloPrincipal{
+            font-family:sans-serif;
+            font-size: 20px;
+            font-weight:bold;
+            }
+            title {
+            display: inline !important;
+            }
+            
+        </style>
+        <title style="display:inline !important">Estatus 1072</title>
+    </head>
+    <body>
+        <title>Estatus 1072</title>
+        <div class="footer">
+            <div class="subfooter">Generado por: {!$User.FirstName} {!$User.LastName} - {!fechaReporte}</div>
+            <div class="subfooter right">Página <span class="pagenumber"/> de <span class="pagecount"/></div>
+            
+        </div>  
+        <apex:image url="{!URLFOR($Resource.SST_logo_empresa, '/LogoHorizontal.jpg')}" style="width: 20%;"/>
+        <div class="slds-scope">
+            <div class="slds-grid">
+                <div class="slds-col">
+                    <br/>
+                    <div class="slds-text-heading_medium">
+                        <center><apex:outputText styleClass="tituloPrincipal" value="ESTATUS IMPLEMENTACIÓN DECRETO 1072"/></center>
+                    </div>
+                </div>
+                <br/>
+                <div class="slds-col">
+                    <apex:outputText styleClass="titulo" value="Nombre de la empresa: "/>
+                    <apex:outputText styleClass="subtitulo" value="{!empresa}"/>
+                </div>
+                <div class="slds-col">
+                    <apex:outputText styleClass="titulo" value="Nit de la empresa: "/>
+                    <apex:outputText styleClass="subtitulo" value="{!nit}"/>
+                </div>
+                
+            </div>
+            <br/>
+            <apex:outputPanel >
+                <apex:pageBlock >
+                    <apex:dataTable id="tablaCiclo1" value="{!mapaCiclo1}" var="key"  >
+                        <apex:column headerValue="{!ciclos[0]}" styleClass="withoutLine" headerClass="withoutLineTitle" >
+                            <apex:dataTable value="{!mapaCiclo1[key]}" var="item"  >
+                                <apex:column headerValue="{!RIGHT(key,len(KEY)-2)}" headerClass="titulo" styleClass="subtitulo" >
+                                    <apex:outputText value="{!item.Descripcion}"/>
+                                </apex:column>
+                                <apex:column headerValue="PRIORIDAD" headerClass="titulo" styleClass="subtitulo">
+                                    <center><apex:outputText value="{!item.Prioridad}" /></center>
+                                </apex:column>
+                                <apex:column headerValue="CUMPLIMIENTO" headerClass="titulo" styleClass="subtitulo">
+                                    <center><apex:outputText value="{!item.Cumplimiento}" /></center>
+                                </apex:column>
+                                <apex:column headerValue="JUSTIFICACIÓN" headerClass="titulo" styleClass="subtitulo">
+                                    <apex:outputText value="{!item.Justificacion}"  />
+                                </apex:column>
+                                <apex:column headerValue="PUNTAJE" headerClass="titulo" styleClass="subtitulo" style="background:{!item.fondoPuntaje}">
+                                    <center><apex:outputText id="puntajeItem" style="background:{!item.fondoPuntaje}" value="{!item.Puntaje}%"/></center>
+                                </apex:column>
+                            </apex:dataTable>
+                        </apex:column>
+                    </apex:dataTable>
+                    <br/>
+                    <br/>
+                    <apex:dataTable id="tablaCiclo2" value="{!mapaCiclo2}" var="key" >
+                        <apex:column headerValue="{!ciclos[1]}" styleClass="withoutLine" headerClass="withoutLineTitle">
+                            <apex:dataTable value="{!mapaCiclo2[key]}" var="item" >
+                                <apex:column headerValue="{!RIGHT(key,len(KEY)-2)}" headerClass="titulo" styleClass="subtitulo" >
+                                    <apex:outputText value="{!item.Descripcion}"/>
+                                </apex:column>
+                                <apex:column headerValue="PRIORIDAD" headerClass="titulo" styleClass="subtitulo">
+                                    <center><apex:outputText value="{!item.Prioridad}" /></center>
+                                </apex:column>
+                                <apex:column headerValue="CUMPLIMIENTO" headerClass="titulo" styleClass="subtitulo">
+                                    <center><apex:outputText value="{!item.Cumplimiento}" /></center>
+                                </apex:column>
+                                <apex:column headerValue="JUSTIFICACIÓN" headerClass="titulo" styleClass="subtitulo">
+                                    <apex:outputText value="{!item.Justificacion}"  />
+                                </apex:column>
+                                <apex:column headerValue="PUNTAJE" headerClass="titulo" styleClass="subtitulo" style="background:{!item.fondoPuntaje}">
+                                    <center><apex:outputText id="puntajeItem" style="background:{!item.fondoPuntaje}" value="{!item.Puntaje}%"/></center>
+                                </apex:column>
+                            </apex:dataTable>
+                        </apex:column>
+                    </apex:dataTable>
+                    <br/>
+                    <br/>
+                    <apex:dataTable id="tablaCiclo3" value="{!mapaCiclo3}" var="key" >
+                        <apex:column headerValue="{!ciclos[2]}" styleClass="withoutLine" headerClass="withoutLineTitle">
+                            <apex:dataTable value="{!mapaCiclo3[key]}" var="item" >
+                                <apex:column headerValue="{!RIGHT(key,len(KEY)-2)}" headerClass="titulo" styleClass="subtitulo" >
+                                    <apex:outputText value="{!item.Descripcion}"/>
+                                </apex:column>
+                                <apex:column headerValue="PRIORIDAD" headerClass="titulo" styleClass="subtitulo">
+                                    <center><apex:outputText value="{!item.Prioridad}" /></center>
+                                </apex:column>
+                                <apex:column headerValue="CUMPLIMIENTO" headerClass="titulo" styleClass="subtitulo">
+                                    <center><apex:outputText value="{!item.Cumplimiento}" /></center>
+                                </apex:column>
+                                <apex:column headerValue="JUSTIFICACIÓN" headerClass="titulo" styleClass="subtitulo">
+                                    <apex:outputText value="{!item.Justificacion}"  />
+                                </apex:column>
+                                <apex:column headerValue="PUNTAJE" headerClass="titulo" styleClass="subtitulo" style="background:{!item.fondoPuntaje}">
+                                    <center><apex:outputText id="puntajeItem" style="background:{!item.fondoPuntaje}" value="{!item.Puntaje}%"/></center>
+                                </apex:column>
+                            </apex:dataTable>
+                        </apex:column>
+                    </apex:dataTable>
+                    <br/>
+                    <br/>
+                    <apex:dataTable id="tablaCiclo4" value="{!mapaCiclo4}" var="key" >
+                        <apex:column headerValue="{!ciclos[3]}" styleClass="withoutLine" headerClass="withoutLineTitle">
+                            <apex:dataTable id="tabla" value="{!mapaCiclo4[key]}" var="item" >
+                                <apex:column headerValue="{!RIGHT(key,len(KEY)-2)}" headerClass="titulo" styleClass="subtitulo" >
+                                    <apex:outputText value="{!item.Descripcion}"/>
+                                </apex:column>
+                                <apex:column headerValue="PRIORIDAD" headerClass="titulo" styleClass="subtitulo">
+                                    <center><apex:outputText value="{!item.Prioridad}" /></center>
+                                </apex:column>
+                                <apex:column headerValue="CUMPLIMIENTO" headerClass="titulo" styleClass="subtitulo">
+                                    <center><apex:outputText value="{!item.Cumplimiento}" /></center>
+                                </apex:column>
+                                <apex:column headerValue="JUSTIFICACIÓN" headerClass="titulo" styleClass="subtitulo">
+                                    <apex:outputText value="{!item.Justificacion}"  />
+                                </apex:column>
+                                <apex:column headerValue="PUNTAJE" headerClass="titulo" styleClass="subtitulo" style="background:{!item.fondoPuntaje}">
+                                    <center><apex:outputText id="puntajeItem" style="background:{!item.fondoPuntaje}" value="{!item.Puntaje}%"/></center>
+                                </apex:column>
+                            </apex:dataTable>
+                        </apex:column>
+                    </apex:dataTable>
+                    <br/>
+                    <br/>
+                    <apex:dataTable id="tablaCiclo5" value="{!mapaCiclo5}" var="key" >
+                        <apex:column headerValue="{!ciclos[4]}" styleClass="withoutLine" headerClass="withoutLineTitle">
+                            <apex:dataTable id="tabla" value="{!mapaCiclo5[key]}" var="item" >
+                                <apex:column headerValue="{!RIGHT(key,len(KEY)-2)}" headerClass="titulo" styleClass="subtitulo" >
+                                    <apex:outputText value="{!item.Descripcion}"/>
+                                </apex:column>
+                                <apex:column headerValue="PRIORIDAD" headerClass="titulo" styleClass="subtitulo">
+                                    <center><apex:outputText value="{!item.Prioridad}" /></center>
+                                </apex:column>
+                                <apex:column headerValue="CUMPLIMIENTO" headerClass="titulo" styleClass="subtitulo">
+                                    <center><apex:outputText value="{!item.Cumplimiento}" /></center>
+                                </apex:column>
+                                <apex:column headerValue="JUSTIFICACIÓN" headerClass="titulo" styleClass="subtitulo">
+                                    <apex:outputText value="{!item.Justificacion}"  />
+                                </apex:column>
+                                <apex:column headerValue="PUNTAJE" headerClass="titulo" styleClass="subtitulo" style="background:{!item.fondoPuntaje}">
+                                    <center><apex:outputText id="puntajeItem" style="background:{!item.fondoPuntaje}" value="{!item.Puntaje}%"/></center>
+                                </apex:column>
+                            </apex:dataTable>
+                        </apex:column>
+                    </apex:dataTable>
+                    
+                    <div class="slds-text-align_center" style="color: #FFFFFF; background: rgb(34, 33, 53) none repeat scroll 0% 0%;">
+                        <center>
+                            <apex:outputText style="color: rgb(34, 33, 53) !important; width: 10%; font-weight:bold; font-size:18px !important; font-family: sans-serif; text-align: center; float: top" value="---------------------------------------"/>
+                            <apex:outputText style="width: 90%; font-weight:bold; font-size:18px !important; font-family: sans-serif; text-align: center; float: top" value="PUNTAJE TOTAL"/>
+                            <apex:outputText style="color: rgb(34, 33, 53) !important; width: 10%; font-weight:bold; font-size:18px !important; font-family: sans-serif; text-align: center; float: top" value="-----------------------------------------"/>
+                            <apex:outputText style="width: 10%; font-weight:bold; font-size:18px !important; font-family: sans-serif; text-align: center; float: top" value="{!puntajeTotalPDF}%"/></center>
+                    </div>
+                    <apex:outputText style="font-size:12px; font-family: sans-serif; border: 1px solid #e7e7e5;  border-radius: .25rem; float: left;white-space: normal" value="El presente reporte es un documento público, no se deben consignar hechos o manifestaciones falsas y está sujeto a las sanciones establecidas en los artículos 288 y 294 de la Ley 599 de 2000 (Código Penal Colombiano)"/>
+                </apex:pageBlock>
+            </apex:outputPanel>
+        </div>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <div class="slds-grid">
+            <div class="slds-col">
+                <div class="slds-text-heading_medium">
+                    <center><apex:outputText styleClass="titulo" style=" margin-left: 5px; " value="______________________________________"/>
+                        <apex:outputText styleClass="titulo" style="margin-left: 55px" value="________________________________________________"/></center>
+                </div>
+                <div class="slds-text-heading_medium">
+                    <center>
+                        <apex:outputText styleClass="titulo" style=" margin-left: 5px; " value="FIRMA DEL EMPLEADOR O CONTRATANTE"/>
+                        <apex:outputText styleClass="titulo" style="margin-left: 55px" value="FIRMA DEL RESPONSABLE DE LA EJECUCIÓN SG-SST"/></center>
+                </div>
+            </div>
+            <br/>
+        </div>            
+    </body>
+    
+</apex:page>

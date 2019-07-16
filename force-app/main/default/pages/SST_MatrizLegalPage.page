@@ -1,0 +1,394 @@
+<apex:page docType="html-5.0" lightningStylesheets="true" controller="SST_MatrizLegalCC" >
+     <!-- Recuso utilizado para el modal con la suma total de los pesos -->
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    
+    <!-- Lightning Design System Source --> 
+    <apex:slds />
+    
+    <!-- Recurso estático para indicar que se está ejecutando una acción en la página -->
+    <c:SST_StatusLoading />
+    
+    <style>
+        body .bPageBlock, body #bodyCell .bResource .secondaryPalette, 
+        body .secondaryPalette.bPageBlock, body .individualPalette .secondaryPalette.bPageBlock, 
+        body .bodyDiv .genericTable, body .genericPageBlockTable, body .bodyDiv .bSubBlock, 
+        body .bComponentBlock .bPageBlock, body .bMyDashboard .bPageBlock, body.rlHoverFrame .bPageBlock, 
+        body.subjectSelectionPopup div.choicesBox, body.lookupTab .secondaryPalette.bPageBlock, 
+        body.popupTab .secondaryPalette.bPageBlock, body.UserTagStatsPage .secondaryPalette.bPageBlock {
+        border-top: 0.5px solid  #eaeaea !important;
+        border-color: #eaeaea !important;
+        border-top-color: rgb(234, 234, 234);
+        }
+        
+        .headerRow .TableTitle {
+        color: #0d0d0d !important; 
+        text-align: center !important;
+        font-size:120% !important; 
+        font-weight:bold !important; 
+        }
+        
+        .slds-scope .slds-select_container::before { 
+        border-bottom: none;
+        }
+        
+        .slds-scope .slds-select_container::after { 
+        height: 7px;
+        width: 7px;
+        top: 15px;
+        }
+        
+        .slds-input{
+        color: #16325c;
+        border: 1px solid #bdbbb1 !important;
+        border-radius: .25rem;
+        text-align:left;
+        transition: border .1s linear,background-color .1s linear;
+        display: inline-block;
+        padding: 0 1rem 0 .75rem;
+        padding-right: 1.8rem;
+        }     
+        
+        A.url:visited{
+        color:purple;
+        text-decoration:none;
+        }   
+    </style>
+    
+    <script> 
+    var j$ =jQuery.noConflict(); 
+    
+    //Función para que al cargar la página, no se haga autofoco en ningún elemento
+    window.onload= function(){
+        document.formPrincipal.prioridad.focus();
+    }
+    
+    //Función para abre el modal, tan pronto se carga la página, para mostrar la suma dinámica del total de los pesos
+    j$( document ).ready(function() {
+        j$('#Modal').addClass('slds-fade-in-open'); 
+    })
+    
+    //Función para ir a la parte superior de la página
+    function topLocation(){
+        window.scrollTo(0,0);
+    }
+    
+    //Método para abrir el modal de confirmación del reporte de Matriz Legal
+    function abrirModalMatrizLegal(){
+        j$('#slds-backdrop3').addClass('slds-backdrop--open');
+        j$('#ModalMatrizLegal').addClass('slds-fade-in-open'); 
+    } 
+    
+    //Método para cerrar el modal de confirmación del reporte de Matriz Legal
+    function cerrarModalMatrizLegal(){
+        j$('#ModalMatrizLegal').removeClass('slds-fade-in-open');
+        j$('#slds-backdrop3').removeClass('slds-backdrop--open'); 
+    }
+    
+    //Método para abrir el modal de confirmación para pasar a la siguiente página
+    function abrirModalSiguiente(){
+        j$('#slds-backdrop3').addClass('slds-backdrop--open');
+        j$('#ModalSiguiente').addClass('slds-fade-in-open'); 
+    } 
+    
+    //Método para cerrar el modal de confirmación para pasar a la siguiente página
+    function cerrarModalSiguiente(){
+        j$('#ModalSiguiente').removeClass('slds-fade-in-open');
+        j$('#slds-backdrop3').removeClass('slds-backdrop--open'); 
+    }
+    
+     //Método para abrir el modal de confirmación para pasar a la anterior página
+    function abrirModalAnterior(){
+        j$('#slds-backdrop3').addClass('slds-backdrop--open');
+        j$('#ModalAnterior').addClass('slds-fade-in-open'); 
+    } 
+    
+    //Método para cerrar el modal de confirmación para pasar a la anterior página
+    function cerrarModalAnterior(){
+        j$('#ModalAnterior').removeClass('slds-fade-in-open');
+        j$('#slds-backdrop3').removeClass('slds-backdrop--open'); 
+    }
+    
+   
+    //Método para abrir el modal de confirmación para pasar a la primer página
+    function abrirModalInicio(){
+        j$('#slds-backdrop3').addClass('slds-backdrop--open');
+        j$('#ModalPaginaInicio').addClass('slds-fade-in-open'); 
+    } 
+    
+    //Método para cerrar el modal de confirmación para pasar a la anterior página
+    function cerrarModalInicio(){
+        j$('#ModalPaginaInicio').removeClass('slds-fade-in-open');
+        j$('#slds-backdrop3').removeClass('slds-backdrop--open'); 
+    }
+    
+    //Método para abrir el modal de confirmación para pasar a la última página
+    function abrirModalFinal(){
+        j$('#slds-backdrop3').addClass('slds-backdrop--open');
+        j$('#ModalPaginaFinal').addClass('slds-fade-in-open'); 
+    } 
+    
+    //Método para cerrar el modal de confirmación para pasar a la última página
+    function cerrarModalFinal(){
+        j$('#ModalPaginaFinal').removeClass('slds-fade-in-open');
+        j$('#slds-backdrop3').removeClass('slds-backdrop--open'); 
+    }
+    </script>
+    
+    <body>
+        <div class="slds-scope">
+            <!--Modal permanente que muestra dinámicamente deel promedio de todas las calificaciones -->
+            <section id="Modal"  role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal"  style="height: 25px;width: 50px; top: 20px !important; left: 775px !important; border-radius: .25rem;">
+                       <header class="slds-modal__header_empty">
+                       </header>
+                       <div class="slds-modal__content-pdf slds-p-around_medium" id="modalMensaje" style=" background-color: rgb(0, 95, 178) !important; color: #FFFFFF !important; font-weight:bold !important;  padding:0 0 0 0 !important;width: 130px !important; min-height: calc(1.875rem + (1px * 2)); border-radius: .25rem;">
+                           <center><apex:outputText value="PROMEDIO:" /></center>
+                           <center><apex:outputText id="calificacionTotal" value="{!IF(promedio==-1,'',promedio)}%" /></center>
+                       </div>
+               </section>
+            <apex:form id="formPrincipal">
+                           <!--Modal de confirmación para generar reporte de Matriz Legal-->
+                <section id="ModalMatrizLegal" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+                    <div id="ModalMatrizLegal2" class="slds-modal__container">
+                        <header id="headerModal" class="slds-modal__header">
+                            <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModalMatrizLegal();">
+                                <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                   path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                <span class="slds-assistive-text">Cerrar</span>
+                            </button>
+                            <apex:outputText id="modal-heading-03" style="font-weight: 300; float: center;white-space: normal; font-size: 1.1rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="Advertencia"/>
+                        </header> 
+                        <div class="slds-modal__content slds-p-around_medium" id="ModalMatrizLegal3">
+                            
+                            <center><apex:outputText value="Para generar el reporte descartando los cambios no guardados, seleccione" /></center>
+                            <center><b><apex:outputText value="Aceptar." /></b></center>
+                            <br/>
+                            <center><apex:outputText value="Para guardar los cambios y generar el reporte, seleccione seleccione" /></center>
+                            <center><b><apex:outputText value="Guardar y generar." /></b></center>
+                            
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <button type="button" id='btnCerrar3' target="_self" class="slds-button slds-button_neutral" data-dismiss="modal" onclick="generarReporteMatrizLegal();" reRender="mensajeGlobal" >Aceptar</button>
+                            <button type="button" id='btnAceptar3' target="_self" class="slds-button slds-button_brand" data-dismiss="modal" onclick="guardar();" reRender="mensajeGlobal" >Guardar y generar</button>
+                        </footer>
+                    </div>
+                </section>
+                <div id="slds-backdrop3" class="slds-backdrop"></div>
+                
+ <!--Modal de confirmación para pasar a la siguiente página-->
+                <section id="ModalSiguiente" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+                    <div id="ModalSiguiente2" class="slds-modal__container">
+                        <header id="headerModal" class="slds-modal__header">
+                            <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModalSiguiente();">
+                                <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                   path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                <span class="slds-assistive-text">Cerrar</span>
+                            </button>
+                            <apex:outputText id="modal-heading-04" style="font-weight: 300; float: center;white-space: normal; font-size: 1.1rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="Advertencia"/>
+                        </header> 
+                        <div class="slds-modal__content slds-p-around_medium" id="ModalMatrizLegal3">
+                            
+                            <center><apex:outputText value="Para pasar a la siguiente página sin guardar, seleccione" /></center>
+                            <center><b><apex:outputText value="Siguiente." /></b></center>
+                            <br/>
+                            <center><apex:outputText value="Para pasar a la siguiente página guardando los cambios, seleccione" /></center>
+                            <center><b><apex:outputText value="Guardar y siguiente." /></b></center>
+                            
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <apex:commandButton id="btnSiguiente" value="Siguiente" action="{!verSiguiente}" styleClass="slds-button slds-button_neutral" oncomplete="cerrarModalSiguiente();" reRender="mensajeGlobal,paginadoSuperior,paginadoInferior,botonSiguiente,botonAnteriorS,botonAnteriorI,botonSiguienteI,formPrincipal,ModalSiguiente2,Calificacion,calificacionTotal,modalMensaje" />
+                            <apex:commandButton id="btnGuardarSiguiente" value="Guardar y siguiente" action="{!verSiguienteGuardar}" styleClass="slds-button slds-button_brand" oncomplete="cerrarModalSiguiente();" reRender="mensajeGlobal,paginadoSuperior,paginadoInferior,botonSiguiente,botonAnteriorS,botonAnteriorI,botonSiguienteI,formPrincipal,ModalSiguiente2" />
+                        </footer>
+                    </div>
+                </section>
+                
+                
+  <!--Modal de confirmación para pasar a la anterior página-->
+                <section id="ModalAnterior" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+                    <div id="ModalAnterior2" class="slds-modal__container">
+                        <header id="headerModal" class="slds-modal__header">
+                            <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModalAnterior();">
+                                <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                   path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                <span class="slds-assistive-text">Cerrar</span>
+                            </button>
+                            <apex:outputText id="modal-heading-05" style="font-weight: 300; float: center;white-space: normal; font-size: 1.1rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="Advertencia"/>
+                        </header> 
+                        <div class="slds-modal__content slds-p-around_medium" id="ModalMatrizLegal3">
+                            
+                            <center><apex:outputText value="Para pasar a la anterior página sin guardar, seleccione" /></center>
+                            <center><b><apex:outputText value="Anterior." /></b></center>
+                            <br/>
+                            <center><apex:outputText value="Para pasar a la anterior página guardando los cambios, seleccione" /></center>
+                            <center><b><apex:outputText value="Guardar y anterior." /></b></center>
+                            
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <apex:commandButton id="btnAnterior" value="Anterior" action="{!verAnterior}" styleClass="slds-button slds-button_neutral" oncomplete="cerrarModalAnterior();" reRender="mensajeGlobal,paginadoSuperior,paginadoInferior,botonSiguiente,botonAnterior,botonAnteriorI,botonSiguienteI,formPrincipal,ModalAnterior2,Calificacion,calificacionTotal,modalMensaje" />
+                            <apex:commandButton id="btnGuardarAnterior" value="Guardar y anterior" action="{!verAnteriorGuardar}" styleClass="slds-button slds-button_brand" oncomplete="cerrarModalAnterior();" reRender="mensajeGlobal,paginadoSuperior,paginadoInferior,botonSiguiente,botonAnterior,botonAnteriorI,botonSiguienteI,formPrincipal,ModalAnterior2" />
+                        </footer>
+                    </div>
+                </section>
+                
+                
+                
+  <!--Modal de confirmación para pasar a la primera página-->
+                <section id="ModalPaginaInicio" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+                    <div id="ModalPaginaInicio2" class="slds-modal__container">
+                        <header id="headerModal" class="slds-modal__header">
+                            <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModalInicio();">
+                                <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                   path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                <span class="slds-assistive-text">Cerrar</span>
+                            </button>
+                            <apex:outputText id="modal-heading-06" style="font-weight: 300; float: center;white-space: normal; font-size: 1.1rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="Advertencia"/>
+                        </header> 
+                        <div class="slds-modal__content slds-p-around_medium" id="ModalMatrizLegal3">
+                          
+                            <center><apex:outputText value="Para pasar a la página de inicio sin guardar, seleccione" /></center>
+                            <center><b><apex:outputText value="Página Inicio" /></b></center>
+                            <br/>
+                            <center><apex:outputText value="Para pasar a la página de inicio guardando los cambios, seleccione" /></center>
+                            <center><b><apex:outputText value="Guardar e Inicio." /></b></center>
+                            
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <apex:commandButton id="btnInicio" value="Página Inicio" action="{!verInicio}" styleClass="slds-button slds-button_neutral" oncomplete="cerrarModalInicio();" reRender="tabla,mensajeGlobal,paginadoSuperior,paginadoInferior,botonSiguiente,botonAnterior,botonAnteriorI,botonSiguienteI,formPrincipal,ModalPaginaInicio2, botonInicio, botonInicioI,Calificacion,calificacionTotal,modalMensaje" />
+                            <apex:commandButton id="btnGuardarInicio" value="Guardar e Inicio" action="{!verInicioGuardar}" styleClass="slds-button slds-button_brand" oncomplete="cerrarModalInicio();" reRender="tabla,mensajeGlobal,paginadoSuperior,paginadoInferior,botonSiguiente,botonAnterior,botonAnteriorI,botonSiguienteI,formPrincipal,ModalPaginaInicio2, botonInicio, botonInicioI" />
+                        </footer>
+                    </div>
+                </section>
+
+      
+                
+  <!--Modal de confirmación para pasar a la última página-->
+                <section id="ModalPaginaFinal" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+                    <div id="ModalPaginaFinal2" class="slds-modal__container">
+                        <header id="headerModal" class="slds-modal__header">
+                            <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModalFinal();">
+                                <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                   path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                <span class="slds-assistive-text">Cerrar</span>
+                            </button>
+                            <apex:outputText id="modal-heading-07" style="font-weight: 300; float: center;white-space: normal; font-size: 1.1rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="Advertencia"/>
+                        </header> 
+                        <div class="slds-modal__content slds-p-around_medium" id="ModalMatrizLegal3">
+                            <center><apex:outputText value="Para pasar a la página final sin guardar, seleccione" /></center>
+                            <center><b><apex:outputText value="Página Final" /></b></center>
+                            <br/>
+                            <center><apex:outputText value="Para pasar a la página final guardando los cambios, seleccione" /></center>
+                            <center><b><apex:outputText value="Guardar y Final" /></b></center>
+                            
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <apex:commandButton id="btnFinal" value="Página Final" action="{!verFinal}" styleClass="slds-button slds-button_neutral" oncomplete="cerrarModalFinal();" reRender="tabla,mensajeGlobal,paginadoSuperior,paginadoInferior,botonSiguiente,botonAnterior,botonAnteriorI,botonSiguienteI,formPrincipal,ModalPaginaInicio2, botonInicio, botonInicioI,botonFin,botonFinI,Calificacion,calificacionTotal,modalMensaje" />
+                            <apex:commandButton id="btnGuardarFinal" value="Guardar y Final" action="{!verFinalGuardar}" styleClass="slds-button slds-button_brand" oncomplete="cerrarModalFinal();" reRender="tabla,mensajeGlobal,paginadoSuperior,paginadoInferior,botonSiguiente,botonAnterior,botonAnteriorI,botonSiguienteI,formPrincipal,ModalPaginaInicio2, botonInicio, botonInicioI,botonFin,botonFinI" />
+                        </footer>
+                    </div>
+                </section>
+            
+            <!-- Form principal -->
+                <div class="slds-grid slds-text-align_center">
+                    <div class="slds-col">
+                        <br />
+                        <div class="slds-text-heading_medium"><center><b> EVALUACIÓN MATRIZ LEGAL </b></center></div>
+                    	<br />
+                    </div>
+                </div>
+                <apex:outputPanel >
+                    <apex:pageBlock >
+                        <br />
+                        <div  class="slds-grid slds-grid_align-end" > 
+                            <apex:commandButton id="btnGuardar1" action="{!Guardar}" rerender="mensajeGlobal,botones,botones2" styleClass="slds-button slds-button_neutral" value="Guardar" disabled="{!!botonActivo}" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();"/>
+                            <apex:commandButton id="botones" value="Generar PDF" onclick="abrirModalMatrizLegal()" styleClass="slds-button slds-button_brand" style="text-decoration:none" reRender="ModalMatrizLegal2"/>
+                            <apex:actionFunction name="guardar" action="{!Guardar}" oncomplete="generarReporteMatrizLegal();" />           
+                            <apex:actionFunction name="generarReporteMatrizLegal" action="{!generarReporteMatrizLegal}"/>           
+                        </div>
+                        <br />
+                    <apex:outputPanel id="mensaje">
+                        <c:SST_Mensajes_Page id="mensajeGlobal" listaMensajes="{!mensajesPaginaPrincipal}"/>
+                    </apex:outputPanel>  
+                    <div >
+                        </div>
+                        <div class="flex-container" >
+                            <div class="slds-grid slds-wrap slds-align_absolute-center">
+                                <apex:outputLabel id="paginadoSuperior" value="Página {!paginaActual} de {!paginas}"/>  
+                            </div>
+                            <div class="slds-grid slds-wrap slds-align_absolute-center">
+                                <apex:commandButton value="<<" id="botonInicio" styleClass="slds-button slds-button_neutral" style="width:15px;height:25px;float:center" onclick="abrirModalInicio();" reRender="ModalPaginaInicio2" />
+                                <apex:commandButton value="<" id="botonAnterior" disabled="{!paginaActual==1}" styleClass="slds-button slds-button_neutral" style="width:15px;height:25px;float:center" onclick="abrirModalAnterior();" reRender="ModalAnterior2"/>
+                                <apex:commandButton value=">" id="botonSiguiente" disabled="{!paginaActual==paginas}" styleClass="slds-button slds-button_neutral" style="width:15px;height:25px;float:right" onclick="abrirModalSiguiente();" reRender="ModalSiguiente2" />
+                                <apex:commandButton value=">>" id="botonFin" styleClass="slds-button slds-button_neutral" style="width:15px;height:25px;float:right" onclick="abrirModalFinal();" reRender="ModalPaginaFinal2"  />
+                            </div>
+                        </div> 
+                        <br />
+                    <apex:pageBlockTable id="tabla" value="{!listaMatriz}" var="Mtz" styleclass="slds-table slds-table_bordered slds-table_cell-buffer" border="1">
+                        <apex:column headerValue="NORMATIVIDAD" headerClass="TableTitle" style="width: 20%; text-align: left; vertical-align: middle;">
+                            <apex:outputText value="Norma:" style="font-weight: bold; white-space:normal;width:100%"/><br/>
+                            <apex:outputLink title="Ir al detalle de la normatividad para adjuntar archivos" value="{!url}/{!Mtz.IdRegistro}" 
+                                             target="_parent" style="float: left;">
+                                <apex:outputText style="float: left;white-space:normal;width:100%" value="{!Mtz.norma}"/><br/>
+                            </apex:outputLink>
+                            <br/>
+                            <apex:outputText value="Artículo:" style="font-weight: bold;white-space:normal;"/>
+                            <br/>
+                                <apex:outputText style="float: left; white-space:normal;width:100%;word-break: break-all;overflow-wrap: break-word;" value="{!Mtz.articulo}"/>
+                                <br/>
+                        </apex:column>
+                        <apex:column headerValue="RESPONSABLE" headerClass="TableTitle" style="width: 8%;text-align: left; vertical-align: middle;">
+                            <div  class="slds-select_container" >                             
+                                <apex:selectList id="responsable" value="{!Mtz.Responsable}" multiselect="false" styleClass="slds-select" size="1" style="width: 130px !important; border:1px solid #bdbbb1  !important;">                                                                                    
+                                    <apex:selectOptions value="{!responsable}"/>
+                                    <apex:actionSupport event="onchange" reRender="funcionarioColumn" onsubmit="showLoadingDialog();" oncomplete="hideLoadingDialog();"/> 
+                                </apex:selectList> 
+                            </div>
+                        </apex:column>
+                        <apex:column id="funcionarioColumn" headerValue="FUNCIONARIO" headerClass="TableTitle" style="text-align: left; vertical-align: middle;">
+                            <div  class="{!IF(Mtz.Responsable<>'EMPRESA','slds-select_container','none')}" rendered="{!Mtz.Responsable<>'EMPRESA'}">   
+                                <apex:selectList id="Funcionarios" value="{!Mtz.IdFuncionario}"  multiselect="false" style="border:1px solid #bdbbb1  !important;" styleClass="slds-select" size="1" rendered="{!Mtz.Responsable<>'EMPRESA'}">                                                                                    
+                                    <apex:selectOptions value="{!funcionario}"/>
+                                </apex:selectList>
+                            </div>
+                        </apex:column>
+                        <apex:column headerValue="CUMPLIMIENTO" headerClass="TableTitle" style="width: 19%;text-align: left; vertical-align: middle;">
+                            <div  class="slds-select_container" >   
+                                <apex:selectList id="cumplimiento" style="border:1px solid #bdbbb1 !important;" value="{!Mtz.Cumplimiento}" multiselect="false" styleClass="slds-select" size="1" >                                                                                    
+                                    <apex:selectOptions value="{!cumplimiento}"/>
+                                    <apex:actionSupport event="onchange" reRender="Calificacion,calificacionTotal,modalMensaje" action="{!calcularPromedio}" onsubmit="showLoadingDialog();" oncomplete="hideLoadingDialog();"/> 
+                                </apex:selectList> 
+                            </div>
+                        </apex:column>
+                        <apex:column id="observaciones" headerClass="TableTitle" headerValue="OBSERVACIONES" style="text-align: left; vertical-align: middle;">
+                            <apex:inputTextarea styleClass="slds-input" id="resEvaluacion" style="width:200px; resize:vertical; height: 2.5em;" value="{!Mtz.Observaciones}" />
+                        </apex:column>
+                        
+                        <apex:column id="Calificacion" headerValue="CALIFICACIÓN" headerClass="TableTitle" style="text-align: center; vertical-align: middle;background:{!IF(Mtz.Cumplimiento==cumple,colorCumple,IF(Mtz.Cumplimiento==cumpleParcialmente,colorCumpleParcialmente,colorNoCumple))};">
+                            <apex:outputText style="font-weight:bold; float: center;white-space: normal" value="{!IF(Mtz.Cumplimiento==cumple,'100%',IF(Mtz.Cumplimiento==cumpleParcialmente,'50%','0%'))}"/>
+                        </apex:column>
+                    </apex:pageBlockTable> 
+                    <br/>
+                        
+                        <div class="flex-container" >
+                            <div class="slds-grid slds-wrap slds-align_absolute-center">
+                                <apex:outputLabel id="paginadoInferior" value="Página {!paginaActual} de {!paginas}"/>  
+                            </div>
+                            <div class="slds-grid slds-wrap slds-align_absolute-center">
+
+                                <apex:commandButton value="<<" id="botonInicioI" styleClass="slds-button slds-button_neutral" style="width:15px;height:25px;float:center" onclick="abrirModalInicio();" reRender="ModalPaginaInicio2" />
+                                <apex:commandButton value="<" id="botonAnteriorI" disabled="{!paginaActual==1}" styleClass="slds-button slds-button_neutral" style="width:15px;height:25px;float:center" onclick="abrirModalAnterior();" reRender="ModalAnterior2"/>
+                                <apex:commandButton value=">" id="botonSiguienteI" disabled="{!paginaActual==paginas}" styleClass="slds-button slds-button_neutral" style="width:15px;height:25px;float:right" onclick="abrirModalSiguiente();" reRender="ModalSiguiente2" />
+                                <apex:commandButton value=">>" id="botonFinI" styleClass="slds-button slds-button_neutral" style="width:15px;height:25px;float:right" onclick="abrirModalFinal();" reRender="ModalPaginaFinal2"  />
+                                
+                            </div>
+                        </div> 
+                        
+                    <div  class="slds-grid slds-grid_align-end"> 
+                    <apex:commandButton id="btnGuardar2" action="{!Guardar}" rerender="mensajeGlobal,botones,botones2" styleClass="slds-button slds-button_neutral" value="Guardar" disabled="{!!botonActivo}" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();"/>
+                    <apex:commandButton id="botones2" value="Generar PDF" onclick="abrirModalMatrizLegal()" styleClass="slds-button slds-button_brand" style="text-decoration:none" reRender="ModalMatrizLegal2"/>
+                </div>
+                </apex:pageBlock>
+                </apex:outputPanel>
+            </apex:form>
+        </div>
+    </body>
+</apex:page>

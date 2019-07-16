@@ -1,0 +1,23 @@
+<!-- Componente para presentar mensajes en una página. -->
+<apex:component >
+    
+    <apex:attribute name="listaMensajes" description="Label on left listbox."
+                    type="SST_MensajesPagina[]" required="true" />
+    
+    <apex:repeat var="mensaje" value="{!listaMensajes}">
+        <div class="slds-notify_container slds-is-relative">
+            <div class="slds-notify slds-notify_toast {!mensaje.claseDiv}" role="alert" style="display: inline-flex !important;">
+                <span class="slds-assistive-text">{!mensaje.tipoMensaje}</span>
+                <span class="slds-icon_container {!mensaje.claseSpan} slds-m-right_small slds-no-flex slds-align-top" title="Description of icon when needed">
+                    <SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon--large" path="{!mensaje.icon}" />
+                </span>
+                <div class="slds-notify__content">
+                    <h2 class="slds-text-heading_small ">
+                        <apex:outputText value="{!mensaje.mensajePage}" escape="false" />
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </apex:repeat>
+    
+</apex:component>

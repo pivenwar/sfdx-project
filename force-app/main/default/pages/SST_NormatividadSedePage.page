@@ -1,0 +1,117 @@
+<apex:page docType="html-5.0" applyHtmlTag="true" applyBodyTag="true" lightningStylesheets="true"   standardController="SST_Normatividad__c"  extensions="SST_NormatividadSedeCC" >        
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <apex:includeScript value="{!URLFOR($Resource.jqueryui, 'jqueryui/js/jquery-ui-1.10.4.custom.min.js')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.jqueryui, 'jqueryui/css/jqueryuidialog/jquery-ui-1.10.4.custom.min.css')}"/>
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        
+        <!-- Lightning Design System Source --> 
+        <apex:slds />
+        
+        <!-- Recurso estático para indicar que se está ejecutando una acción en la página -->
+        <c:SST_StatusLoading />
+        
+        <style>
+            body .bPageBlock, body #bodyCell .bResource .secondaryPalette, 
+            body .secondaryPalette.bPageBlock, body .individualPalette .secondaryPalette.bPageBlock, 
+            body .bodyDiv .genericTable, body .genericPageBlockTable, body .bodyDiv .bSubBlock, 
+            body .bComponentBlock .bPageBlock, body .bMyDashboard .bPageBlock, body.rlHoverFrame .bPageBlock, 
+            body.subjectSelectionPopup div.choicesBox, body.lookupTab .secondaryPalette.bPageBlock, 
+            body.popupTab .secondaryPalette.bPageBlock, body.UserTagStatsPage .secondaryPalette.bPageBlock {
+            border-top: 0.5px solid  #eaeaea !important;
+            border-color: #eaeaea !important;
+            border-top-color: rgb(234, 234, 234);
+            }
+        </style>
+        <script>
+        //Función para devolverse a la página anterior
+        function devolver(){
+            window.history.go(-1);
+        }
+        
+        //Función para ir a la parte superior de la página
+        function topLocation(){
+            window.scrollTo(0,0);
+        }
+        
+        var j$ =jQuery.noConflict(); 
+        
+        //Método para abrir el modal de mensajes
+        function abrirModal(){
+            j$('#Modal').addClass('slds-fade-in-open'); 
+            j$('#slds-backdrop').addClass('slds-backdrop--open');
+        }
+        
+        //Método para cerrar el modal de mensajes
+        function cerrarModal(){
+            //regresar();
+            j$('#Modal').removeClass('slds-fade-in-open');
+            j$('#slds-backdrop').removeClass('slds-backdrop--open'); 
+        }
+        </script>
+        
+        <apex:outputPanel id="mensaje">
+            <c:SST_Mensajes_Page id="mensajeGlobal" listaMensajes="{!mensajesPaginaPrincipal}"/>
+        </apex:outputPanel> 
+        <body class="slds-scope">
+            <center>
+                <div class="slds-text-heading_medium"><b>ASOCIAR SEDES A LA NORMATIVIDAD</b></div>
+                <br/> 
+                <div class="slds-text-heading_small"><b>Nombre: </b>{!normaSeleccionada.name} <b> - Empresa: </b>{!nombreEmpresa}</div>
+            </center>    
+            <br />
+            
+            <apex:form id="formPrincipal">
+                
+                <!--pageBlock para la asociación de sedes -->
+                <apex:pageBlock id="sedes">
+                    <br/> 
+                    <div class="slds">
+                            <div class="slds-form-element">
+                                <apex:outputPanel id="competencias">
+                                    <c:SST_MultiselectPicklist leftLabel="Disponibles"
+                                                               left="{!unSelectedValues}"
+                                                               rightLabel="Seleccionados"
+                                                               right="{!SelectedValues}"
+                                                               size="10"
+                                                               width="100%" height="200px"/>
+                                </apex:outputPanel>
+                            </div>
+                        </div>                                  
+                </apex:pageBlock>
+                <br/> 
+               
+                <div  class="slds-grid slds-grid_align-end">
+                    <apex:commandButton id="btnRegresar2"  styleClass="slds-button slds-button_neutral slds-not-selected" value="Cancelar" onclick="devolver();"/>
+                    <apex:commandButton value="Guardar" action="{!guardar}"  styleClass="slds-button slds-button_brand" style="margin-left:1%;" onclick="abrirModal();" reRender="Modal2,Modal3,mensajeModal,footer,btnAceptar,btnCerrar2" />
+                </div>
+                <apex:actionFunction name="regresar" action="{!regresar}"/>
+            
+            
+            <!--Modal con mensaje de asociación exitosa-->
+           
+                <section id="Modal" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal ">
+                    <div id="Modal2" class="slds-modal__container">
+                        <header id="headerModal" class="slds-modal__header">
+                            <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar y volver al detalle del seguimiento" onclick="regresar();">
+                                <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                   path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                <span class="slds-assistive-text">Cerrar</span>
+                            </button>
+                            <apex:outputText id="modal-heading-03" style="font-weight: 300; float: center;white-space: normal; font-size: 1.1rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="Advertencia"/>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium" id="Modal3">
+                            <center><b><apex:outputText id="mensajeModal" value="{!mensaje}" /></b></center>
+                            <br/>
+                        </div>
+                        <footer id="footer" class="slds-modal__footer" >
+                            <apex:CommandButton id="btnAceptar" styleClass="slds-button slds-button_brand" value="{!Accion}" action="{!regresar}"  />
+                        </footer>
+                        <apex:actionFunction name="regresar" action="{!regresar}"/>
+                    </div>
+                </section>
+                <div id="slds-backdrop" class="slds-backdrop"></div>
+            </apex:form>
+        </body>
+    </html>
+</apex:page>

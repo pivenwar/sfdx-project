@@ -1,0 +1,272 @@
+<apex:page showHeader="false" standardController="SST_Registro_de_Novedades__c"  extensions="SST_FuratPDFCC"  renderAs="pdf" applyBodyTag="false" applyHtmlTag="false" title="FORMATO UNICO DE ACCIDENTE DE TRABAJO"
+                   standardStylesheets="false" lightningStylesheets="false">
+                
+            <head>
+        <style type="text/css" media="print">           
+            @page {                
+            @bottom-left {
+            content: element(footer);
+            }
+            }
+            .titulo{
+            font-family:sans-serif;
+            font-size: 14px;
+            font-weight:bold;
+            text-align:center;
+            }
+            .subtitulo{
+            font-family:sans-serif;
+            font-weight:normal;
+            font-size: 13px;
+            text-align:left;
+            }
+            div.footer {
+            display: block;
+            padding: 5px;
+            position: running(footer);
+            font-family:sans-serif;
+            font-size: 13px;
+            }
+            
+            div.subfooter {
+            display: inline-block;
+            font-family:sans-serif;
+            font-size: 13px;
+            }
+           
+            
+            .pagenumber:before {
+            content: counter(page);
+            }
+            
+            .pagecount:before {
+            content: counter(pages);
+            }
+      
+           </style>
+                <title style="display:inline !important" >INFORME ACCIDENTE DE TRABAJO DEL EMPLEADOR O CONTRATANTE</title>
+        
+            </head>
+            <body>
+              
+                <title >FORMATO UNICO DE ACCIDENTE DE TRABAJO</title>
+                <div class="footer">
+                     
+                    <div class="subfooter">Generado por: {!$User.FirstName} {!$User.LastName}</div>
+                    <div class="subfooter right">Página <span class="pagenumber"/> de <span class="pagecount"/></div>
+                    
+                </div>  
+                <apex:image url="{!URLFOR($Resource.SST_logo_empresa, '/LogoHorizontal.jpg')}" style="width: 20%;"/>
+                <div class="slds-scope">
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <br/>
+                            <div class="slds-text-heading_medium">
+                                <center><apex:outputText styleClass="titulo" value="INFORME ACCIDENTE DE TRABAJO DEL EMPLEADOR O CONTRATANTE"/></center>
+                            </div>
+                        </div>
+                        <br/>
+                        <br/>
+                     
+ <table width="100%" border="1" cellpadding="0" cellspacing="0" bordercolor="#000000">
+  <tr>
+      <td colspan="3" class="subtitulo"><b>EPS A LA QUE ESTÁ AFILIADO: </b><br/>{!registroFurat.epsFuncionario}</td>
+    <td colspan="1" class="subtitulo"><b>CÓDIGO EPS:</b><br/> {!registroFurat.epsCodigoFuncionario}</td>
+    
+  </tr>
+  <tr>
+    <td colspan="3" class="subtitulo"><b>ARL A LA QUE ESTÁ AFILIADO:</b><br/> {!registroFurat.arlFuncionario}</td>
+    <td colspan="1" class="subtitulo"><b>CÓDIGO ARL:</b><br/> {!registroFurat.arlCodigoFuncionario}</td> 
+  </tr>
+  <tr>
+    <td colspan="3" class="subtitulo"><b>AFP A LA QUE ESTÁ AFILIADO:</b><br/>{!registroFurat.afpFuncionario}</td>
+    <td colspan="1" class="subtitulo"><b>CÓDIGO AFP O SEGURO SOCIAL: </b><br/>{!registroFurat.afpCodigoFuncionario}</td>
+  </tr>
+  <tr>
+     <td colspan="4" class="titulo" style="background: #005fb2; color:white; ">I. IDENTIFICACIÓN GENERAL DEL EMPLEADOR, CONTRATANTE O COOPERATIVA</td>
+  </tr>
+  <tr>
+    <td colspan="4" class="subtitulo"><b>TIPO DE VINCULADOR LABORAL:</b><br/> {!registroFurat.vinculacionLaboral}</td>     
+  </tr>
+  <tr>
+ <td colspan="4" class="titulo" >SEDE PRINCIPAL</td>    
+  </tr>
+  <tr>
+      <td colspan="3" class="subtitulo"><b>NOMBRE DE LA ACTIVIDAD ECONÓMICA:</b><br/> {!registroFurat.actividadEconomica}</td>
+      <td colspan="1" class="subtitulo"><b>CÓDIGO:</b><br/> {!registroFurat.codigoActividad}</td> 
+  </tr>
+  <tr>
+      <td colspan="2" class="subtitulo"><b>NOMBRE O RAZÓN SOCIAL:</b><br/> {!registroFurat.nombreEmpresa}</td>
+      <td colspan="1" class="subtitulo"><b>TIPO DE IDENTIFICACIÓN:</b><br/> NIT</td>
+      <td colspan="1" class="subtitulo"><b>NÚMERO: </b><br/> {!registroFurat.identificacionEmpresa}</td>
+  </tr>
+  <tr>
+      <td colspan="2" class="subtitulo"><b>DIRECCIÓN:</b><br/> {!registroFurat.direccionEmpresa}</td>
+      <td colspan="2" class="subtitulo"><b>TELÉFONO:</b><br/> {!registroFurat.telefonoEmpresa}</td>
+  </tr>
+  <tr>
+      <td colspan="4" class="subtitulo"><b>CORREO ELECTRÓNICO:</b><br/> {!registroFurat.correoElectronico}</td>
+      
+  </tr>
+     <tr>
+     <td colspan="3" class="subtitulo"><b>DEPARTAMENTO:</b><br/> {!registroFurat.departamentoEmpresa}</td>
+     <td colspan="1" class="subtitulo"><b>CÓDIGO DEPARTAMENTO:</b><br/> {!registroFurat.codigoDepartamentoEmpresa}</td>
+     </tr>
+     <tr>
+     <td colspan="3" class="subtitulo"><b>MUNICIPIO:</b><br/> {!registroFurat.municipioEmpresa}</td>
+     <td colspan="1" class="subtitulo"><b>CÓDIGO MUNICIPIO:</b><br/> {!registroFurat.codigoMunicipioEmpresa}</td>
+     </tr>
+     <tr>
+     <td colspan="4" class="subtitulo"><b>ZONA:</b><br/> {!registroFurat.zonaEmpresa}</td>
+     </tr>
+     <tr>
+       <td colspan="4" class="titulo" >CENTRO DE TRABAJO DONDE LABORA EL TRABAJADOR: </td>
+     </tr>
+       <tr>
+           <td colspan="2" class="subtitulo"><b>CENTRO DE TRABAJO DONDE LABORA EL TRABAJADOR:</b> <br/> {!registroFurat.sede}</td>  
+       <td colspan="1" class="subtitulo"><b>DIRECCIÓN:</b><br/> {!registroFurat.direccionSede}</td>
+       <td colspan="1" class="subtitulo"><b>TELÉFONO:</b><br/> {!registroFurat.telefonoSede}</td>
+     </tr>
+     <tr>
+       <td colspan="3" class="subtitulo"><b>DEPARTAMENTO:</b><br/> {!registroFurat.departamentoSede}</td>
+       <td colspan="1" class="subtitulo"><b>CÓDIGO DEPARTAMENTO:</b><br/> {!registroFurat.codigoDepartamentoSede}</td>
+      
+     </tr>
+     <tr>
+      <td colspan="3" class="subtitulo"><b>MUNICIPIO:</b><br/> {!registroFurat.municipioSede}</td>
+       <td colspan="1" class="subtitulo"><b>CÓDIGO MUNICIPIO:</b><br/> {!registroFurat.codigoMunicipioSede}</td>
+     </tr>
+     <tr>
+       <td colspan="4" class="titulo" style="background: #005fb2; color:white; ">II. INFORMACIÓN DE LA PERSONA QUE SE ACCIDENTÓ</td>
+     </tr>
+     <tr>
+       <td colspan="4" class="subtitulo"><b>TIPO DE VINCULACIÓN:</b><br/> {!registroFurat.tipoContrato}</td>
+     </tr>
+     <tr>
+       <td colspan="2" class="subtitulo"><b>NOMBRES:</b><br/> {!registroFurat.nombreEmpleado}</td>
+       <td colspan="2" class="subtitulo"><b>APELLIDOS:</b><br/> {!registroFurat.apellidoEmpleado}</td>
+     </tr>
+     <tr>
+       <td colspan="3" class="subtitulo"><b>TIPO DE IDENTIFICACIÓN:</b><br/> {!registroFurat.tipoIdentificacionEmpleado}</td>
+       <td colspan="1" class="subtitulo"><b>NÚMERO:</b><br/> {!registroFurat.identificacionEmpleado}</td>
+       
+     </tr>
+     <tr>
+       <td colspan="2" class="subtitulo"><b>FECHA DE NACIMIENTO:</b><br/> {!registroFurat.fechaNacimientoEmpleado}</td>
+       <td colspan="2" class="subtitulo"><b>SEXO:</b><br/>{!registroFurat.genero}</td> 
+     </tr>
+     <tr>
+       <td colspan="2" class="subtitulo"><b>DIRECCIÓN:</b><br/> {!registroFurat.direccionEmpleado}</td>
+       <td colspan="2" class="subtitulo"><b>TELÉFONO:</b><br/> {!registroFurat.telefonoEmpleado}</td>
+      </tr>
+      <tr>
+       <td colspan="2" class="subtitulo"><b>DEPARTAMENTO:</b><br/> {!registroFurat.departamentoEmpresa}</td>
+       <td colspan="2" class="subtitulo"><b>MUNICIPIO:</b><br/> {!registroFurat.municipioEmpresa}</td>
+
+      </tr>
+      <tr>
+       <td colspan="2" class="subtitulo"><b>OCUPACIÓN HABITUAL:</b><br/> {!registroFurat.cargo}</td>
+       <td colspan="2" class="subtitulo"><b>TIEMPO DE OCUPACIÓN HABITUAL AL MOMENTO DEL ACCIDENTE:</b><br/> {!registroFurat.tiempoLaborado}</td>
+     </tr>
+     <tr>
+       <td colspan="2" class="subtitulo"><b>FECHA DE INGRESO A LA EMPRESA:</b><br/> {!registroFurat.fechaIngreso}</td>
+       <td colspan="2" class="subtitulo"><b>SALARIO U HONORARIOS (MENSUAL):</b><br/> {!registroFurat.salario}</td>
+     </tr>
+     <tr>
+       <td colspan="4" class="subtitulo"><b>JORNADA DE TRABAJO HABITUAL:</b><br/> {!registroFurat.jornadaHabitual}</td>
+     </tr>
+     <tr>
+       <td colspan="4" class="titulo" style="background: #005fb2; color:white; ">III. INFORMACIÓN SOBRE EL ACCIDENTE</td>
+     </tr>
+      <tr>
+       <td colspan="2" class="subtitulo"><b>FECHA DEL ACCIDENTE:</b><br/> {!registroFurat.fechaInicial}</td>
+       <td colspan="2" class="subtitulo"><b>HORA DEL ACCIDENTE:</b><br/> {!registroFurat.hora}</td>
+     </tr>
+     <tr>
+         <td colspan="4" class="subtitulo"><b>DÍA DE LA SEMANA EN EL QUE OCURRIÓ EL ACCIDENTE:</b><br/> {!registroFurat.diaAccidente} </td>
+    </tr>
+      <tr>
+       <td colspan="2" class="subtitulo"><b>JORNADA EN QUE SUCEDE:</b><br/> {!registroFurat.jornada}</td>
+       <td colspan="2" class="subtitulo"><b>ESTABA REALIZANDO SU LABOR HABITUAL:</b><br/> {!registroFurat.laborHabitual}</td>     
+     </tr>
+     <tr>
+         <td colspan="4" class="subtitulo"><b>SÓLO EN CASO DE SER NO:</b><br/> {!registroFurat.cualLabor}</td>
+     </tr>
+     <tr>
+       <td colspan="3" class="subtitulo"><b>TOTAL TIEMPO LABORADO PREVIO AL ACCIDENTE:</b><br/> {!registroFurat.tiempoLaborado}</td>
+       <td colspan="1" class="subtitulo"><b>TIPO DE  ACCIDENTE:</b><br/> {!registroFurat.tipoAccidente}</td>
+     </tr>
+     <tr>
+       <td colspan="2" class="subtitulo"><b>CAUSÓ LA MUERTE AL TRABAJADOR?:</b><br/> {!registroFurat.causoMuerte}</td>
+       <td colspan="2" class="subtitulo"><b>DEPARTAMENTO DEL ACCIDENTE:</b><br/> {!registroFurat.departamento}</td>
+       
+     </tr>
+     <tr>
+     <td colspan="2" class="subtitulo"><b>MUNICIPIO DEL ACCIDENTE:</b><br/> {!registroFurat.municipio}</td>
+       <td colspan="2" class="subtitulo"><b>ZONA DONDE OCURRIÓ EL ACCIDENTE:</b><br/> {!registroFurat.zona}</td>
+     </tr>
+     <tr>
+        <td colspan="4" class="subtitulo"><b>LUGAR DONDE OCURRIÓ EL ACCIDENTE:</b><br/> {!registroFurat.lugar}</td>
+     </tr>
+  
+     <tr>
+        <td colspan="2" class="subtitulo"><b>CUÁL SITIO:</b><br/> {!registroFurat.sitio}</td>
+         <td colspan="2" class="subtitulo"><b>TIPO DE LESIÓN:</b><br/> {!registroFurat.tipoLesion}</td>
+     </tr>
+          <tr>
+             <td colspan="4" class="subtitulo"><b>PARTE DEL CUERPO APARENTEMENTE AFECTADO:</b><br/> {!registroFurat.parteCuerpo}</td>
+          </tr>
+     <tr>
+         <td colspan="4" class="subtitulo"><b>AGENTE DEL ACCIDENTE(CON QUÉ SE LESIONÓ EL TRABAJADOR):</b><br/> {!registroFurat.agenteAccidente}</td>
+     </tr>
+     <tr>
+        <td colspan="4" class="subtitulo"><b>MECANISMO O FORMA DEL ACCIDENTE:</b><br/> {!registroFurat.mecanismoAccidente}</td>
+     </tr>
+          <tr>
+             <td colspan="4" class="titulo" style="background: #005fb2; color:white; ">IV. DESCRIPCIÓN DEL ACCIDENTE</td>
+          </tr>
+          <tr>
+            <td colspan="4" class="subtitulo">{!registroFurat.descripcion}</td>
+            
+          </tr>
+          <tr>
+              <td colspan="4" class="titulo" style="background: #005fb2; color:white; ">PERSONAS QUE PRESENCIARON EL ACCIDENTE</td>
+          </tr>
+          <tr>
+              <td colspan="4" class="subtitulo"><b>APELLIDOS Y NOMBRES COMPLETOS: </b><br/>{!registroFurat.nombrePersonaUno}</td>
+              
+         </tr>
+         <tr>
+                 <td colspan="4" class="subtitulo"><b>CARGO:</b><br/> {!registroFurat.cargoPersonaUno}</td>
+        </tr>
+        <tr>
+              <td colspan="4" class="subtitulo"><b>APELLIDOS Y NOMBRES COMPLETOS:</b><br/> {!registroFurat.nombrePersonaDos}</td>
+         </tr>
+         <tr>
+              <td colspan="4" class="subtitulo"><b>CARGO:</b><br/> {!registroFurat.cargoPersonaDos}</td>
+             </tr>
+           <tr>
+              <td colspan="4" class="titulo" style="background: #005fb2; color:white; ">PERSONA RESPONSABLE DEL INFORME</td>
+          </tr>
+          <tr>
+             <td colspan="3" class="subtitulo"><b>APELLIDOS Y NOMBRES COMPLETOS:</b><br/> {!registroFurat.personaResponsable}</td>
+             <td colspan="1" class="subtitulo"><b>DOCUMENTO DE IDENTIDAD:</b><br/> {!registroFurat.identificacionResponsable}</td>
+         </tr>
+         <tr>
+            <td colspan="4" class="subtitulo"><b>CARGO:</b><br/> {!registroFurat.cargo}</td>
+        </tr>
+     
+           <tr>
+          <td HEIGHT="50" class="subtitulo" colspan="4"><b>FIRMA:</b> </td>
+
+            
+        </tr>
+        </table >
+                                             
+          </div>
+             
+        </div>
+                        
+            </body>
+           
+        </apex:page>

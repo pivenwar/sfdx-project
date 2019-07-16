@@ -1,0 +1,289 @@
+<apex:page showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false"
+           applyBodyTag="false" docType="html-5.0" lightningStylesheets="true"
+           controller="SST_ComunicacionesCC">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="es">
+        <head>
+            <meta charset="utf-8" />
+            <meta http-equiv="x-ua-compatible" content="ie=edge" />
+            <title>COMUNICACIONES</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            
+            <!-- Import the Design System style sheet -->
+            <apex:slds />
+            
+            <!-- Recurso estático para indicar que se está ejecutando una acción en la página -->
+            <c:SST_StatusLoading />
+        </head>
+        <style>
+            body .bPageBlock, body #bodyCell .bResource .secondaryPalette, 
+            body .secondaryPalette.bPageBlock, body .individualPalette .secondaryPalette.bPageBlock, 
+            body .bodyDiv .genericTable, body .genericPageBlockTable, body .bodyDiv .bSubBlock, 
+            body .bComponentBlock .bPageBlock, body .bMyDashboard .bPageBlock, body.rlHoverFrame .bPageBlock, 
+            body.subjectSelectionPopup div.choicesBox, body.lookupTab .secondaryPalette.bPageBlock, 
+            body.popupTab .secondaryPalette.bPageBlock, body.UserTagStatsPage .secondaryPalette.bPageBlock {
+            border: 0px solid  #ffffff !important;
+            border-color: #ffffff !important;
+            }
+            
+            .slds-input{
+            color: #16325c;
+            border: 1px solid #bdbbb1;
+            border-radius: .25rem;
+            text-align:left;
+            transition: border .1s linear,background-color .1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 .75rem;
+            padding-right: 1.8rem;
+            width: 80px;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            }
+            
+            p{
+            width:100%;
+            text-align:justify;
+            }
+            
+            b{
+            width:100%;
+            text-align:center;
+            }
+            
+            
+            .slds-scope .slds-select_container::before { 
+            border-bottom: none;
+            }
+            
+            .slds-scope .slds-select_container::after { 
+            height: 5px;
+            width: 7px;
+            top: 13px;
+            }
+            
+            
+            .myForm{
+            
+            position:absolute;
+            top:3%;
+            right:3%;
+            left:3%;
+            //background-image: url("{!URLFOR($Resource.LogoModuloComunicaciones, '/login_back.jpg')}");
+            }
+        </style>
+        <script>
+        //navigator.userAgent
+        window.onload= function(){
+            //alert(navigator.userAgent);
+        }
+        
+        //Función para limitar los caracteres permitidos en el input de Identificación
+        function inputLimiter(e,allow) {
+            var AllowableCharacters = '';
+            if (allow == 'NameCharactersAndNumbers'){AllowableCharacters='1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';}
+            var k = document.all?parseInt(e.keyCode): parseInt(e.which);
+            if (k!=13 && k!=8 && k!=0){
+                if ((e.ctrlKey==false) && (e.altKey==false)) {
+                    return (AllowableCharacters.indexOf(String.fromCharCode(k))!=-1);
+                } else {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        } 
+        </script>
+        <body >
+            <apex:form styleClass="myForm">
+                <div class="slds-scope">
+                    
+                    <div class="flex-container" >
+                        <div class="slds-grid slds-wrap slds-align_absolute-center">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                <div class="slds-text-align_center slds-form-element__control">
+                                    <apex:image style="width:70%" url="{!URLFOR($Resource.SST_logo_empresa, '/LogoHorizontal.jpg')}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                    <br />
+                    <div class="flex-container" >
+                        <div class="slds-grid slds-wrap slds-align_absolute-center">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                <div class="slds-text-align_center slds-form-element__control">
+                                    <apex:outputText value="COMUNICACIONES SST" style="font-weight:bold;font-size:1.3em"></apex:outputText>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                    
+                    <center>
+                        <apex:outputPanel id="mensaje">
+                            <c:SST_MensajesPaginaMobil id="mensajeGlobal" listaMensajes="{!mensajesPaginaPrincipal}"/>
+                            <br />
+                        </apex:outputPanel>  
+                    </center>
+                    <!-- Bloque con el form para búsqueda del contacto por cédula -->
+                    <apex:pageBlock id="form1" rendered="{!NOT(mostrarInfo)}">
+                        
+                        <div class="flex-container" >
+                            <div class="slds-grid slds-wrap slds-align_absolute-center">
+                                <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                    <div class="slds-text-align_center slds-form-element__control">
+                                        <apex:outputText value="BIENVENIDO" style="font-weight:bold;font-size:1.3em"></apex:outputText>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                        <br />
+                        <div class="flex-container" >
+                            <div class="slds-grid slds-wrap slds-align_absolute-center">
+                                <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                    <div class="slds-text-align_center slds-text-longformslds-form-element__control">
+                                        <p>
+                                            Reporte por este medio cualquier accidente, incidente, acto o condición insegura, solicitudes sobre elementos de protección personal y otros temas SST, relacionados con usted o cualquier integrante de la empresa.    
+                                        </p>
+                                        <br />
+                                        <b>
+                                            Para empezar digite su número de identificación sin puntos, caracteres especiales ni el dígito de verificación:
+                                        </b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                        <br />
+                        
+                        <div class="flex-container" >
+                            <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                    <label class="slds-form-element__label" for="text-input-01" >Identificación</label>
+                                    <div class="slds-form-element__control">
+                                        <apex:input id="text-input-029" styleClass="slds-input" style="width:100%;background-color:#ffffff"
+                                                    value="{!cedula}" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers');"
+                                                    html-onpaste="return false" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                        <br />
+                        <div class="flex-container" >
+                            <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4 slds-text-align_right">
+                                    <button type="button" target="_self" class="slds-button slds-button_neutral" onclick="limpiar();" reRender="mensajeGlobal" >Limpiar</button>
+                                    <button type="button" target="_self" class="slds-button slds-button_brand" onclick="buscar();" reRender="form2,mensajeGlobal" >Continuar</button>
+                                    <apex:actionFunction action="{!consultarContacto}" name="buscar" />
+                                    <apex:actionFunction action="{!cancelar}" name="limpiar" />
+                                </div>
+                            </div>
+                        </div> 
+                    </apex:pageBlock>   
+                    
+                    <!-- Bloque con el form para ingresar el detalle del reporte a enviar -->                    
+                    <apex:pageBlock id="form2" rendered="{!mostrarInfo}">
+                        <center>
+                            <apex:outputText value="DATOS DEL INFORME" style="font-weight:bold;font-size:1.3em"></apex:outputText>
+                        </center>    
+                        <br />
+                        <div class="flex-container">
+                            <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--2-of-4">
+                                    <div class="slds-form slds-form_stacked" role="list">
+                                        <div class="slds-grid slds-gutters_small">
+                                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                    <span class="slds-form-element__label">Nombre</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">{!nombre}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                    <span class="slds-form-element__label">Tipo de contacto</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">{!tipoContacto}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-grid slds-gutters_small">
+                                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                    <span class="slds-form-element__label">Sede del informador</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">{!sede}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                    <span class="slds-form-element__label">Área del informador</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">{!area}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="flex-container">
+                            <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--2-of-4">
+                                    <label class="slds-form-element__label" for="text-input-015" >Empresa para la cual se genera el reporte</label>
+                                    <div class="slds-form-element__control">
+                                        <div  class="slds-select_container">
+                                            <apex:selectList value="{!empresa}" multiselect="false" styleClass="slds-select" size="1" style="border:1px solid #bdbbb1  !important;">                                                                                    
+                                                <apex:selectOptions value="{!empresas}"/>
+                                            </apex:selectList> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="flex-container">
+                            <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--2-of-4">
+                                    <label class="slds-form-element__label" for="text-input-015" >Detalle</label>
+                                    <div class="slds-form-element__control">
+                                        <apex:inputTextarea styleClass="slds-input" title="Ingrese el detalle del reporte que desea presentar" id="text-input-06" rows="10" style="width:100%;resize:vertical" value="{!detalle}"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="slds-modal__content slds-p-around_medium" >
+                            <apex:outputPanel layout="block" style="float:left; margin-left:23%; width:50%">
+                                <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                                <apex:inputFile accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg" styleClass="slds-button slds-button_neutral" style="border:none" title="Click para seleccionar el archivo"
+                                                value="{!fileBody}" filename="{!fileName}" contentType="{!contentType}" fileSize="{!fileSize}"/>
+                            </apex:outputPanel>
+                        </div> 
+                        <br />
+                        <div class="flex-container">
+                            <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--2-of-4 slds-text-align_right slds-vertical-align-end">
+                                    <button type="button" target="_self" class="slds-button slds-button_neutral" onclick="volver();" reRender="mensajeGlobal" >Volver</button>
+                                    <button type="button" target="_self" class="slds-button slds-button_brand" onclick="guardar();" reRender="form2,mensajeGlobal" >Enviar</button>
+                                    <apex:actionFunction action="{!guardar}" name="guardar" />
+                                    <apex:actionFunction action="{!cancelar}" name="volver" />
+                                </div>
+                            </div>
+                        </div> 
+                    </apex:pageBlock>
+                    <div class="flex-container">
+                        <div class="slds-grid slds-wrap slds-align_absolute-center">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--1-of-4 slds-text-align_center slds-vertical-align-end">
+                                <apex:outputLink value="{!linkSST}" target="_blank">
+                                    <apex:image style="width:35%" url="{!URLFOR($Resource.LogoModuloComunicaciones, '/LOGO_SST_BLUE.png')}"/> 
+                                </apex:outputLink>
+                                <apex:outputLink value="https://www.heinsohn.com.co" target="_blank">
+                                    <apex:image style="width:65%" url="{!URLFOR($Resource.LogoModuloComunicaciones, '/poweredHBT.JPG')}"/>
+                                </apex:outputLink>
+                            </div>
+                        </div>
+                    </div>                         
+                </div>
+            </apex:form>
+        </body>
+    </html>
+</apex:page>

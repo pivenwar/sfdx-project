@@ -1,0 +1,260 @@
+<apex:page showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false"
+           applyBodyTag="false" docType="html-5.0" lightningStylesheets="true"
+           controller="SST_EncuestaSociodemograficaCC">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="es">
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <head>
+            <meta charset="utf-8" />
+            <meta http-equiv="x-ua-compatible" content="ie=edge" />
+            <title>ENCUESTA</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            
+            <!-- Import the Design System style sheet -->
+            <apex:slds />
+            
+            <!-- Recurso estático para indicar que se está ejecutando una acción en la página -->
+            <c:SST_StatusLoading />
+            
+            <!-- Recurso estático para importar todas las funciones javascript y estilos usados en las páginas de la encueesta -->
+            <apex:stylesheet value="{!URLFOR($Resource.SST_Scripts_and_StyleSheets, '/sststylesheetsencuesta.css')}"/>
+            <apex:includeScript value="{!URLFOR($Resource.SST_Scripts_and_StyleSheets, '/sstscriptsencuesta.js')}"/>
+        </head> 
+        <script>
+        var j$ =jQuery.noConflict();
+        </script>
+        <body class="slds-scope" id="inicio" > 
+            <apex:outputPanel id="formPrincipal">
+                <!--Sección con el logo y encabezado de la página-->
+                <apex:form rendered="true">
+                    <div class="flex-container" >
+                        <div class="slds-grid slds-wrap slds-align_absolute-center">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                <div class="slds-text-align_center slds-form-element__control">
+                                    <apex:image style="width:70%" url="{!URLFOR($Resource.SST_logo_empresa, '/LogoHorizontal.jpg')}"/>
+                                </div>
+                            </div> 
+                        </div>
+                    </div>  
+                    <br /><br />
+                    <div class="flex-container" >
+                        <div class="slds-grid slds-wrap slds-align_absolute-center">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--2-of-4">
+                                <div class="slds-text-align_center slds-form-element__control">
+                                    <apex:outputText id="text-input-028" style="color:black;font-weight:bold;font-size:1.3em;width:100%;background-color:#ffffff" value="ENCUESTA SOCIODEMOGRÁFICA" />
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                    <center>
+                        <apex:outputPanel id="mensaje">
+                            <br />
+                            <c:SST_Mensajes_Page id="mensajeGlobal" listaMensajes="{!mensajesPaginaPrincipal}"/>
+                            <br />
+                        </apex:outputPanel>  
+                    </center>
+                    
+                    <!--Página con el encabezado de la encuesta y la autorización para el tratamiento de datos personales-->
+                    <apex:outputPanel styleClass="myForm" rendered="{!IF(mostrarSeccion==false && mostrarSubseccion1==false && mostrarSubseccion2==false && mostrarSubseccion3==false,false,true)}">
+                        <!-- Bloque con el formulario para búsqueda del contacto por cédula -->
+                        <apex:pageBlock id="seccion" >    
+                            <apex:outputPanel rendered="{!mostrarSeccion}">
+                                <div class="flex-container" >
+                                    <div class="slds-grid slds-wrap slds-align_absolute-center">
+                                        <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--4-of-4">
+                                            <div class="slds-text-align_center slds-text-longformslds-form-element__control">
+                                                <p>
+                                                    La empresa {!nombreEmpresa} está cada vez más comprometida en implementar programas de prevención y promoción que permitan evitar accidentes y enfermedades laborales.
+                                                    Por lo anterior, lo invitamos a contestar la siguiente encuesta, cuyos resultados no solo darán cumplimiento a la normatividad vigente, sino que además permitirá establecer planes y programas específicos y efectivos frente a los factores de riesgo que están afectando de manera prioritaria la seguridad y salud de nuestros funcionarios y contratistas. De igual forma, permitirá generar pautas de estilo de vida saludable que podrán ser aplicadas en el ambiente laboral, personal y familiar.
+                                                    <br /> <br />
+                                                    Dentro de la encuesta encontrará un pregunta de inclusión social “Pertenece a la Población LGTBI”  la cual está relacionada con datos personales sensibles, por lo que de acuerdo con la Ley Estatutaria 1581 de 2012 usted se  encuentra facultado para responderla o no. Por lo tanto esta pregunta no es un condicional para continuar con el diligenciamiento de la encuesta.
+                                                    Se recuerda que el manejo de la información suministrada por usted tendrá garantía de confidencialidad y la custodia requerida de la información, puesto que solamente será procesada por el área de Seguridad y Salud en el trabajo y para los fines anteriormente descritos.
+                                                    <br /> <br />
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>    
+                            </apex:outputPanel>
+                            <br /><br /><br />
+                            <apex:outputPanel id="form1" rendered="{!mostrarSubseccion1}">
+                                <div class="slds-grid slds-wrap slds-align_absolute-center">
+                                    <b>
+                                        Para empezar digite el código de acceso proporcionado por correo electrónico y su número de identificación sin puntos ni caracteres especiales:
+                                    </b>       
+                                </div> 
+                                <br /><br />
+                                <div class="flex-container" >
+                                    <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                        <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                            <label class="slds-form-element__label" for="text-input-01" >Código de acceso</label>
+                                            <div class="slds-form-element__control">
+                                                <apex:input id="text-input-028" styleClass="slds-input" style="width:100%;background-color:#ffffff" value="{!contacto.codigo}" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers');"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                            <label class="slds-form-element__label" for="text-input-01" >Identificación</label>
+                                            <div class="slds-form-element__control">
+                                                <apex:input id="text-input-029" styleClass="slds-input" style="width:100%;background-color:#ffffff"
+                                                            value="{!contacto.identificacion}" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers');"
+                                                            html-onpaste="return false" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> 
+                                <br />
+                                <div class="flex-container" >
+                                    <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                        <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--2-of-4 slds-text-align_right">
+                                            <button type="button" target="_self" class="slds-button slds-button_neutral" onclick="limpiar();" reRender="mensajeGlobal" >Limpiar</button>
+                                            <button type="button" target="_self" class="slds-button slds-button_brand" onclick="buscar();this.disabled=true;" reRender="form1,form2,mensajeGlobal" >Continuar</button>
+                                            <apex:actionFunction action="{!consultarContacto}" name="buscar" /> 
+                                            <apex:actionFunction action="{!cancelar}" name="limpiar" />
+                                        </div>
+                                    </div>
+                                </div> 
+                            </apex:outputPanel>
+                            <apex:outputPanel id="form2" rendered="{!mostrarSubseccion2}">
+                                <div class="flex-container" >
+                                    <div class="slds-grid slds-wrap slds-align_absolute-center">
+                                        <b>
+                                            AUTORIZACIÓN PARA EL TRATAMIENTO DE DATOS PERSONALES
+                                            <br /><br />
+                                        </b> 
+                                        <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--4-of-4">
+                                            <div class="slds-text-align_center slds-text-longformslds-form-element__control">
+                                                <apex:inputTextarea styleClass="slds-inputtextarea" style="height: 100px !important;" rows="2" value="{!textoPolitica}" readOnly="true"/>
+                                                <br /><br />    
+                                                <b>
+                                                    {!$ObjectType.SST_Informacion_sociodemografica__c.fields.Consentimiento__c.inlineHelpText}:
+                                                    <br /> <br />
+                                                </b>
+                                                <div class="slds-form-element__control slds-align_absolute-center">
+                                                    <apex:selectRadio value="{!infoContacto.Consentimiento__c}">
+                                                        <apex:selectOption id="SI" itemValue="SI" itemLabel="SI" /><br />
+                                                        <apex:selectOption id="NO" itemValue="NO" itemLabel="NO" />
+                                                    </apex:selectRadio>
+                                                </div> 
+                                                <br />
+                                                <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--4-of-4 slds-text-align_right">
+                                                    <button type="button" target="_self" class="slds-button slds-button_brand" onclick="iniciar();this.disabled=true;" reRender="form2,mensajeGlobal" >Continuar</button>
+                                                    <apex:actionFunction action="{!iniciarEncuesta}" name="iniciar" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                </div> 
+                                <br />
+                            </apex:outputPanel> 
+                            <apex:outputPanel id="form3" rendered="{!mostrarSubseccion3}">
+                                <div class="slds-grid slds-wrap slds-align_absolute-center">
+                                    <b>
+                                        Se enviará la notificación al área de Seguridad y Salud en el trabajo referente a la no autorización de su parte para el diligenciamiento de la encuesta.
+                                    </b>       
+                                </div>
+                                <br /><br />                            
+                                <div class="flex-container" >
+                                    <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                        <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--2-of-4 slds-text-align_right">
+                                            <button type="button" target="_self" class="slds-button slds-button_neutral" onclick="devolver('1');" reRender="mensajeGlobal" >Atrás</button>
+                                            <button type="button" target="_self" class="slds-button slds-button_brand" onclick="topLocation('6');" >Enviar</button>
+                                            <apex:actionFunction action="{!irAtras}" onbeforedomupdate="hideLoadingDialog();" reRender="formPrincipal" name="irAtras" />
+                                            <apex:actionFunction action="{!irAdelante}" onbeforedomupdate="hideLoadingDialog();" reRender="mensajeGlobal,formPrincipal" name="finalizar" />
+                                        </div>
+                                    </div>
+                                </div> 
+                            </apex:outputPanel>
+                        </apex:pageBlock>                     
+                    </apex:outputPanel>
+                    
+                    <!--Modal con mensaje de formulario inválido-->
+                    <apex:outputPanel id="formModal">
+                        <section id="ModalValidacion" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+                            <div id="ModalValidacion2" class="slds-modal__container">
+                                <header id="headerModal" class="slds-modal__header">
+                                    <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModalValidacion();">
+                                        <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                           path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                        <span class="slds-assistive-text">Cerrar</span>
+                                    </button>
+                                    <apex:outputText id="modal-heading-03" style="font-weight: 300; float: center;white-space: normal; font-size: 1.3rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="Advertencia"/>
+                                </header>
+                                <div class="slds-modal__content slds-p-around_medium" id="Modal3">
+                                    <center><apex:outputText id="modal-heading-04" style="font-weight: 300; float: center;white-space: normal; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="Verifique los datos ingresados teniendo en cuenta lo siguiente:"/></center><br />
+                                    <apex:outputText id="modal-heading-05" style="font-weight: 300; float: center;white-space: normal; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="- Los campos marcados con asterisco son obligatorios."/><br />
+                                    <apex:outputText id="modal-heading-06" style="font-weight: 300; float: center;white-space: normal; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="- El formato de fecha es DD/MM/AAAA y debe estar en el rango del año 1900 a la fecha actual."/><br />
+                                    <apex:outputText id="modal-heading-07" style="font-weight: 300; float: center;white-space: normal; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="- Hay preguntas cuya respuesta es dependiente de otras y pueden o no volverse obligatorias"/><br />
+                                    <apex:outputText id="modal-heading-08" style="font-weight: 300; float: center;white-space: normal; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="- Los valores de porcentaje deben estar en el rango de 1 a 100"/><br />
+                                </div>
+                                <footer class="slds-modal__footer">
+                                    <button type="button" id='btnCerrar2' class="slds-button slds-button_brand" data-dismiss="modal" onclick="cerrarModalValidacion();">Aceptar</button>
+                                </footer>
+                            </div>
+                        </section>
+                        <div id="slds-backdrop-validacion" class="slds-backdrop"></div>
+                    </apex:outputPanel>
+                    
+                    <!--Modal con mensaje de formulario inválido-->
+                    <apex:outputPanel id="formModal2">
+                        <section id="ModalValidacion-form2" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+                            <div id="ModalValidacion2-form2" class="slds-modal__container">
+                                <header id="headerModal2" class="slds-modal__header">
+                                    <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModalValidacion2();">
+                                        <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                           path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                        <span class="slds-assistive-text">Cerrar</span>
+                                    </button>
+                                    <apex:outputText id="modal-heading-09" style="font-weight: 300; float: center;white-space: normal; font-size: 1.3rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="Advertencia"/>
+                                </header>
+                                <div class="slds-modal__content slds-p-around_medium" id="Modal3">
+                                    <center><apex:outputText id="modal-heading-10" style="font-weight: 300; float: center;white-space: normal; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="Verifique los datos ingresados teniendo en cuenta lo siguiente:"/></center><br />
+                                    <apex:outputText id="modal-heading-11" style="font-weight: 300; float: center;white-space: normal; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="- Todos los datos de la subsección 1, y la pregunta 1 de la subsección 2 son obligatorios."/><br />
+                                    <apex:outputText id="modal-heading-12" style="font-weight: 300; float: center;white-space: normal; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="- El formato de fecha es DD/MM/AAAA y debe ser menor a la fecha actual."/><br />
+                                    <apex:outputText id="modal-heading-13" style="font-weight: 300; float: center;white-space: normal; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="- Si su familiar padece de discapacidad, debe diligenciar las preguntas 2 a 5."/><br />
+                                    <apex:outputText id="modal-heading-14" style="font-weight: 300; float: center;white-space: normal; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="- Si su familiar ha sido beneficiario de un programa del gobierno por discapacidad, debe diligenciar las preguntas 6 a 8, en caso contrario deje estas casillas en blanco."/><br />
+                                    <apex:outputText id="modal-heading-15" style="font-weight: 300; float: center;white-space: normal; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="- Si el beneficio se encuentra en curso, diligencie el nombre y la fecha de inicio y deje la casilla de fecha fin en blanco."/><br />
+                                </div>
+                                <footer class="slds-modal__footer">
+                                    <button type="button" id='btnCerrar2' class="slds-button slds-button_brand" data-dismiss="modal" onclick="cerrarModalValidacion2();">Aceptar</button>
+                                </footer>
+                            </div>
+                        </section>
+                        <div id="slds-backdrop-validacion2" class="slds-backdrop"></div>
+                    </apex:outputPanel>
+                </apex:form>
+                <apex:outputPanel id="secciones">
+                <!--Página con la sección 1 de la encuesta: caracterización general-->
+                <apex:include pageName="{!pagina1}" rendered="{!mostrarSeccion1}" id="inicio1"/>
+                
+                <!--Página con la sección 2 de la encuesta: caracterización laboral-->
+                <apex:include pageName="{!pagina2}" rendered="{!mostrarSeccion2}" id="inicio2"/> 
+                
+                <!--Página con la sección 3 de la encuesta: caracterización personal y de discapacidad-->
+                <apex:include pageName="{!pagina3}" rendered="{!mostrarSeccion3}" id="inicio3"/> 
+                
+                <!--Página con la sección 4 de la encuesta: caracterización familiar-->
+                <apex:include pageName="{!pagina4}" rendered="{!mostrarSeccion4}" id="inicio4"/> 
+                
+                <!--Página con la sección 5 de la encuesta: aprovechamiento de actividades de bienestar -->
+                <apex:include pageName="{!pagina5}" rendered="{!mostrarSeccion5}" id="inicio5"/> 
+                </apex:outputPanel>
+            </apex:outputPanel> 
+            <!-- Sección con los logos del footer -->
+            <apex:outputPanel rendered="true">
+                <br /><br />
+                <div class="flex-container">
+                    <div class="slds-grid slds-wrap slds-align_absolute-center">
+                        <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--1-of-4 slds-text-align_center slds-vertical-align-end">
+                            <apex:outputLink title="Ir al Módulo de comunicaciones SST" value="{!linkSST}" target="_blank">
+                                <apex:image style="width:35%" url="{!URLFOR($Resource.LogoModuloComunicaciones, '/LOGO_SST_BLUE.png')}"/> 
+                            </apex:outputLink>
+                            <apex:outputLink title="Ir al portal de Heinsohn Business Technology" value="https://www.heinsohn.com.co" target="_blank"> 
+                                <apex:image style="width:65%" url="{!URLFOR($Resource.LogoModuloComunicaciones, '/poweredHBT.JPG')}"/>
+                            </apex:outputLink>
+                        </div>
+                    </div>
+                </div> 
+            </apex:outputPanel>
+        </body>
+    </html> 
+</apex:page>

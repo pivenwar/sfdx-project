@@ -1,0 +1,398 @@
+<apex:page id="pagina" docType="html-5.0" lightningStylesheets="true"   controller="SST_IndicadoresResultadoCC">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <apex:includeScript value="{!URLFOR($Resource.jqueryui, 'jqueryui/js/jquery-ui-1.10.4.custom.min.js')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.jqueryui, 'jqueryui/css/jqueryuidialog/jquery-ui-1.10.4.custom.min.css')}"/>
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        
+        <head>
+            <!-- Lightning Design System Source -->    
+            <apex:slds />    
+            
+            <!-- Recurso estático para indicar que se está ejecutando una acción en la página -->
+            <c:SST_StatusLoading />
+            
+            <style>
+                body .bPageBlock, body #bodyCell .bResource .secondaryPalette, 
+                body .secondaryPalette.bPageBlock, body .individualPalette .secondaryPalette.bPageBlock, 
+                body .bodyDiv .genericTable, body .genericPageBlockTable, body .bodyDiv .bSubBlock, 
+                body .bComponentBlock .bPageBlock, body .bMyDashboard .bPageBlock, body.rlHoverFrame .bPageBlock, 
+                body.subjectSelectionPopup div.choicesBox, body.lookupTab .secondaryPalette.bPageBlock, 
+                body.popupTab .secondaryPalette.bPageBlock, body.UserTagStatsPage .secondaryPalette.bPageBlock {
+                border-top: 0.5px solid  #eaeaea !important;
+                border-color: #eaeaea !important;
+                border-top-color: rgb(234, 234, 234);
+                }
+                
+                .slds-scope .slds-select_container::before { 
+                border-bottom: none;
+                }
+                
+                .slds-scope .slds-select_container::after { 
+                height: 7px;
+                width: 7px;
+                top: 35px;
+                }
+                
+                .slds-input{
+                color: #16325c;
+                border: 1px solid #bdbbb1;
+                border-radius: .25rem;
+                text-align:left;
+                transition: border .1s linear,background-color .1s linear;
+                display: inline-block;
+                padding: 0 1rem 0 .75rem;
+                padding-right: 1.8rem;
+                width: 80px;
+                line-height: 1.875rem;
+                min-height: calc(1.875rem + (1px * 2));
+                }
+                
+                input[type=date]::-webkit-inner-spin-button, 
+                input[type=date]::-webkit-outer-spin-button { 
+                -webkit-appearance: none; 
+                margin: 0; 
+                }
+                input[type=date] {
+                -moz-appearance:textfield;
+                }
+                A.url:visited{
+                color:purple;
+                text-decoration:none;
+                }   
+            </style>      
+            <script language="javascript">
+            function validate(){
+                var fNameObj = document.getElementById('{!$Component.formPrincipal.bloque.fechaFin}').value;
+                var gNameObj = '{!fechaMax}';
+                if(fNameObj == '' || fNameObj > gNameObj)
+                {
+                    return false;
+                } else {
+                    showLoadingDialog();
+                }
+            }
+            
+            var j$ =jQuery.noConflict(); 
+            
+            //Método para abrir el modal con el detalle del análisis del indicador seleccionado
+            function abrirModal(){
+                j$('#Modal').addClass('slds-fade-in-open'); 
+                j$('#slds-backdrop').addClass('slds-backdrop--open');
+            }
+            
+            //Método para cerrar el modal con el detalle del análisis del indicador seleccionado
+            function cerrarModal(){
+                j$('#Modal').removeClass('slds-fade-in-open');
+                j$('#slds-backdrop').removeClass('slds-backdrop--open'); 
+            }
+            </script> 
+            
+        </head>  
+        <body>
+            <div class="slds-scope">
+                <apex:form id="formPrincipal">
+                    <br />
+                    <apex:outputPanel id="mensaje">
+                        <c:SST_Mensajes_Page id="mensajeGlobal" listaMensajes="{!mensajesPaginaPrincipal}"/>
+                    </apex:outputPanel>  
+                    <br />
+                    <!-- Bloque con las opciones para consulta-->
+                    <apex:pageBlock id="bloque" >
+                        <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-center" >
+                            <div class="slds-grid slds-gutters" >
+                                <div class="slds-col slds-grow-none">
+                                    <apex:outputText style="float: left;" value="Seleccione un indicador"/>
+                                    <div  class="slds-select_container">
+                                        <apex:selectList id="indicador" value="{!indicadorSelect}" multiselect="false" styleClass="slds-select" size="1" style="height: 7px; border:1px solid rgb(217, 219, 221)  !important;">
+                                            <apex:selectOptions value="{!indicadores}"/>
+                                        </apex:selectList>  
+                                    </div>
+                                </div>
+                                <!--div class="slds-col slds-grow-none" id="bloqueFechaI" > 
+<apex:outputText style="float: left;" value="Seleccione una fecha de inicio"/>
+<apex:input id="fechaInicio" title="La fecha de inicio se autocalcula a partir de la fecha de fin seleccionada y la frecuencia de medición parametrizada para el indicador seleccionado" type="date" onchange="validarFechaInicio(this.value);" value="{!fechaInicio}" styleClass="slds-input" html-min="{!fechaMin}" html-max="{!fechaMax}" required="true" disabled="true">
+</apex:input>
+</div-->
+                                <div class="slds-col slds-grow-none" >
+                                    <apex:outputText style="float: left;" value="Seleccione una fecha de fin"/>
+                                    <apex:input id="fechaFin" title="Seleccione la fecha de fin para el cálculo del indicador.  A esta fecha se le restan los días de frecuencia de medición del indicador seleccionado para calcular la fecha de inicio"
+                                                type="date" value="{!fechaFin}" styleClass="slds-input" html-max="{!fechaMax}"
+                                                required="true">
+                                    </apex:input>
+                                </div>
+                                <div class="slds-col slds-grow-none" id="btn">
+                                    <br/>
+                                    <apex:commandButton id="btnConsultar" value="Consultar"  action="{!consultar}" styleClass="slds-button slds-button_brand" style="height:32px !important" reRender="mensajeGlobal,bloque2" onclick="validate()" oncomplete="hideLoadingDialog();" />
+                                </div>
+                            </div> 
+                        </div>
+                    </apex:pageBlock>
+                    
+                    <!-- Bloque con el resultado del indicador consultado-->
+                    <apex:pageBlock id="bloque2" >
+                        <center >
+                            <br/>
+                            <div id="bloque3" class="slds-grid slds-grid_align-center">
+                                <div style="width:28%" class="slds-col slds-p-horizontal_medium slds-size_3-of-6">
+                                    <fieldset class="slds-box slds-theme--default slds-container--small">
+                                        <center><apex:outputText style="color: black; font-weight:bold; font-size:15px !important; font-family: sans-serif; text-align: center; float: top" value="INDICADOR"/></center>
+                                        <br/>
+                                        <apex:outputPanel >
+                                            <fieldset style="background-color:{!bakcgroundIndicador}"  class="slds-box slds-theme--default slds-container--large">
+                                                <center><apex:outputText style="color: black; font-weight:bold; font-size:15px !important; font-family: sans-serif; text-align: center; float: top" value="{!indicador}"/></center>
+                                            </fieldset>
+                                        </apex:outputPanel>
+                                    </fieldset>
+                                </div>
+                                <div style="width:28%" class="slds-col slds-p-horizontal_medium slds-size_3-of-6">
+                                    <fieldset class="slds-box slds-theme--default slds-container--small">
+                                        <center><apex:outputText style="color: black; font-weight:bold; font-size:15px !important; font-family: sans-serif; text-align: center; float: top" value="META"/></center>
+                                        <br/>
+                                        <apex:outputPanel >
+                                            <fieldset class="slds-box slds-theme--default slds-container--small">
+                                                <center><apex:outputText style="color: black; font-size:15px !important; font-family: sans-serif; text-align: center; float: top" value="{!metaIndicador}"/></center>
+                                            </fieldset>
+                                        </apex:outputPanel>
+                                    </fieldset>
+                                </div>
+                                <div style="width:28%" class="slds-col slds-p-horizontal_medium slds-size_3-of-6">
+                                    <fieldset class="slds-box slds-theme--default slds-container--small">
+                                        <center><apex:outputText style="color: black; font-weight:bold; font-size:15px !important; font-family: sans-serif; text-align: center; float: top" value="PERIODO CALCULADO"/></center>
+                                        <br/>
+                                        <apex:outputPanel >
+                                            <fieldset class="slds-box slds-theme--default slds-container--small">
+                                                <center><apex:outputText style="color: black; font-size:15px !important; font-family: sans-serif; text-align: center; float: top" value="{!periodo}"/></center>
+                                            </fieldset>
+                                        </apex:outputPanel>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <br/>
+                            <div id="bloque4" class="slds-grid slds-grid_align-center">
+                                <div style="margin-right:6%" class="slds-col slds-p-horizontal_medium slds-size_3-of-6">
+                                    <fieldset style="width:113%;height:190px" class="slds-box slds-theme--default slds-container--medium">
+                                        <center><apex:outputText style="color: black; font-weight:bold; font-size:15px !important; font-family: sans-serif; text-align: center; float: top" value="CÁLCULO"/></center>
+                                        <br/>
+                                        <apex:outputPanel >
+                                            <fieldset style="height:110px" class="slds-box slds-theme--default slds-container--small">
+                                                <center><apex:outputText style="color: black; font-size:15px !important; font-family: sans-serif; text-align: center; float: top" value="{!resultado}"/></center>
+                                                <center><apex:outputText style="color: black; font-size:15px !important; font-family: sans-serif; text-align: center; float: top" value="{!resultado2}"/></center>
+                                            </fieldset>
+                                        </apex:outputPanel>
+                                    </fieldset>
+                                </div>
+                                <div style="width:28%;margin-right:0%;height:192px" class="slds-col slds-p-horizontal_medium slds-size_3-of-6">
+                                    <fieldset class="slds-box slds-theme--default slds-container--small">
+                                        <center><apex:outputText style="color: black; font-weight:bold; font-size:15px !important; font-family: sans-serif; text-align: center; float: top" value="PARÁMETROS"/></center>
+                                        <br/>
+                                        <apex:outputPanel >
+                                            <fieldset style="width:101% !important; height:112px"  class="slds-box slds-theme--default slds-container--small">
+                                                <center><apex:outputText style="color: black; font-size:15px !important; font-family: sans-serif; text-align: center; float: top" value="{!unidadIndicador}"/></center> <br />
+                                                <center><apex:outputText style="color: black; font-size:15px !important; font-family: sans-serif; text-align: center; float: top" value="{!frecuencia}"/></center>
+                                            </fieldset>
+                                        </apex:outputPanel>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <br/>
+                            <div id="bloque5" class="slds-grid slds-grid_align-left" style="margin-left:8%" >
+                                <div style="margin-right:0%" class="slds-col slds-p-horizontal_medium slds-size_3-of-6">
+                                    <fieldset style="width:189%;height:130px" class="slds-box slds-theme--default">
+                                        <apex:outputText style="color: black; font-weight:bold; font-size:15px !important; font-family: sans-serif; text-align: left; float: top" value="ANÁLISIS"/>
+                                        <br/>
+                                        <apex:outputPanel >
+                                            <br/>
+                                            <center><apex:inputTextarea styleClass="slds-input" id="analisis" style="width:92% !important; height:50px; color: black; font-size:15px !important; font-family: sans-serif; text-align: left; float: top" value="{!analisis}" disabled="{!idIndicador == null && !indicadoresExistentes.empty}"/></center> <br />
+                                        </apex:outputPanel>
+                                    </fieldset>
+                                </div>
+                                
+                                <br/>
+                                
+                            </div>
+                            
+                            <div id="bloque6" class="slds-grid slds-grid_align-left" style="margin-left:80%">
+                                <div style="margin-left:11%" class="slds-col slds-p-horizontal_medium slds-size_3-of-6">
+                                    <br/>
+                                    <br/>
+                                    <div class="slds-col slds-grow-none" id="btn2">
+                                        <apex:commandButton id="btnGuardar" value="Guardar"  action="{!guardar}" styleClass="slds-button slds-button_brand" style="height:32px !important" reRender="mensajeGlobal,bloque2,tabla,analisis" oncomplete="hideLoadingDialog();" disabled="{!if((idIndicador == null && !indicadoresExistentes.empty) || botonActivo==false || mensajesPaginaPrincipal.size>0,true,false)}" onclick="showLoadingDialog();"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <br/>
+                            <br/>
+                            <apex:pageBlockTable id="tabla" value="{!indicadoresExistentes}" var="Ind" styleclass="slds-table slds-table_bordered slds-table_cell-buffer" border="1">
+                                <apex:column headerValue="Identificador" headerClass="TableTitle" style="width: 20%; text-align: left; vertical-align: middle;">
+                                    <apex:commandLink title="Ver el detalle del indicador" style="float: left;white-space:normal;width:100%" action="{!mostrarRegistroSeleccionado}"
+                                                      value="{!Ind.identificadorDTO}" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();abrirModal();" rendered="{!esAdmin}" reRender="Modal2,Modal3,detalle,headerModal,footer,modal-heading-03">
+                                        <apex:param name="idRegistroSeleccionado" value="{!Ind.idDTO}" assignTo="{!idRegistroSeleccionado}"/>
+                                    </apex:commandLink>
+                                    <apex:outputLink title="Ir al detalle del indicador" value="{!url}/{!Ind.idDTO}" 
+                                                     target="_parent" style="float: left;" rendered="{!NOT(esAdmin)}">
+                                        <apex:outputText style="float: left;white-space:normal;width:100%" value="{!Ind.identificadorDTO}"/><br/>
+                                    </apex:outputLink>
+                                </apex:column>
+                                
+                                <apex:column headerValue="Indicador" headerClass="TableTitle" style="width: 20%; text-align: left; vertical-align: middle;">
+                                    <apex:outputText style="float: left;white-space:normal;width:100%" value="{!Ind.indicadorDTO}"/><br/>
+                                </apex:column>
+                                
+                                <apex:column headerValue="Fecha Inicial" headerClass="TableTitle" style="width: 20%; text-align: left; vertical-align: middle;">
+                                    <apex:outputText style="float: left;white-space:normal;width:100%" value="{!Ind.fInicialDTO}"/><br/>
+                                </apex:column>
+                                
+                                <apex:column headerValue="Fecha Final" headerClass="TableTitle" style="width: 20%; text-align: left; vertical-align: middle;">
+                                    <apex:outputText style="float: left;white-space:normal;width:100%" value="{!Ind.fFinalDTO}"/><br/>
+                                </apex:column>
+                                
+                                <apex:column id="an" headerValue="Análisis" headerClass="TableTitle" style="width: 20%; text-align: left; vertical-align: middle;">
+                                    <apex:outputText style="float: left;white-space:normal;width:100%" value="{!Ind.analisisDTO}"/><br/>
+                                </apex:column>
+                                
+                            </apex:pageBlockTable>
+                        </center>  
+                        <apex:actionFunction name="mostrarRegistroSeleccionado" action="{!mostrarRegistroSeleccionado}"/>
+                    </apex:pageBlock>
+                    <section id="Modal" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal ">
+                        <div id="Modal2" class="slds-modal__container">
+                            <header id="headerModal" class="slds-modal__header">
+                                <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModal();">
+                                    <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                       path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                    <span class="slds-assistive-text">Cerrar</span>
+                                </button>
+                                <apex:outputText id="modal-heading-03" style="font-weight: 300; float: center;white-space: normal; font-size: 1.1rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="Detalle indicador  {!registroSeleccionado.identificadorDTO}"/>
+                            </header>
+                            <div class="slds-modal__content slds-p-around_medium" id="Modal3">
+                                <apex:outputPanel id="detalle">
+                                    <div class="flex-container">
+                                        <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                            <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--3-of-4">
+                                                <div class="slds-form slds-form_stacked" role="list">
+                                                    <div class="slds-grid slds-gutters_small">
+                                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                                <span class="slds-form-element__label"><b>Nombre Indicador:</b></span>
+                                                                <div class="slds-form-element__control">
+                                                                    <div class="slds-form-element__static">{!registroSeleccionado.nombre}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><br />     
+                                    <div class="flex-container">
+                                        <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                            <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--3-of-4">
+                                                <div class="slds-form slds-form_stacked" role="list">
+                                                    <div class="slds-grid slds-gutters_small">
+                                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                                <span class="slds-form-element__label"><b>Indicador:</b></span>
+                                                                <div class="slds-form-element__control">
+                                                                    <div class="slds-form-element__static">{!registroSeleccionado.indicadorDTO}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                                <span class="slds-form-element__label"><b>Meta:</b></span>
+                                                                <div class="slds-form-element__control">
+                                                                    <div class="slds-form-element__static">{!registroSeleccionado.meta}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div><br />
+                                                    <div class="slds-grid slds-gutters_small">
+                                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                                <span class="slds-form-element__label"><b>Fecha Inicial:</b></span>
+                                                                <div class="slds-form-element__control">
+                                                                    <div class="slds-form-element__static">{!registroSeleccionado.fInicialDTO}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                                <span class="slds-form-element__label"><b>Fecha Final:</b></span>
+                                                                <div class="slds-form-element__control">
+                                                                    <div class="slds-form-element__static">{!registroSeleccionado.fFinalDTO}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div><br />
+                                                    </div><br />
+                                                    <div class="slds-grid slds-gutters_small">
+                                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                                <span class="slds-form-element__label"><b>Unidad Indicador:</b></span>
+                                                                <div class="slds-form-element__control">
+                                                                    <div class="slds-form-element__static">{!registroSeleccionado.unidad}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                                <span class="slds-form-element__label"><b>Frecuencia:</b></span>
+                                                                <div class="slds-form-element__control">
+                                                                    <div class="slds-form-element__static">{!registroSeleccionado.frecuencia}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> 
+                                            </div>
+                                        </div>
+                                    </div> <br />
+                                    <div class="flex-container">
+                                        <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                            <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--3-of-4">
+                                                <div class="slds-form slds-form_stacked" role="list">
+                                                    <div class="slds-grid slds-gutters_small">
+                                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                                <span class="slds-form-element__label"><b>Cálculo:</b></span>
+                                                                <div class="slds-form-element__control">
+                                                                    <div class="slds-form-element__static">{!registroSeleccionado.calculo}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <br />
+                                    <div class="flex-container">
+                                        <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                            <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--3-of-4">
+                                                <div class="slds-form slds-form_stacked" role="list">
+                                                    <div class="slds-grid slds-gutters_small">
+                                                        <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                                            <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                                                <span class="slds-form-element__label"><b>Análisis:</b></span>
+                                                                <div class="slds-form-element__control">
+                                                                    <div class="slds-form-element__static">{!registroSeleccionado.analisisDTO}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <br />    
+                                </apex:outputPanel>
+                            </div>
+                            <footer id="footer" class="slds-modal__footer" >
+                                <apex:CommandButton id="btnAceptar" styleClass="slds-button slds-button_brand" value="Aceptar"  onclick="cerrarModal();" />
+                            </footer>
+                        </div>
+                    </section>
+                    <div id="slds-backdrop" class="slds-backdrop"></div>
+                </apex:form>
+            </div>
+        </body>
+    </html>
+</apex:page>

@@ -1,0 +1,246 @@
+<apex:page id="page" docType="html-5.0" lightningStylesheets="true"   controller="SST_Estatus1072CC">
+    
+    <!-- Recuso utilizado para el modal con la suma total de los pesos -->
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    
+    <!-- Recurso estático para indicar que se está ejecutando una acción en la página -->
+    <c:SST_StatusLoading />
+    
+    <!-- Lightning Design System Source -->
+    <apex:slds />
+    
+    <style>
+        
+        body .bPageBlock, body #bodyCell .bResource .secondaryPalette, 
+        body .secondaryPalette.bPageBlock, body .individualPalette .secondaryPalette.bPageBlock, 
+        body .bodyDiv .genericTable, body .genericPageBlockTable, body .bodyDiv .bSubBlock, 
+        body .bComponentBlock .bPageBlock, body .bMyDashboard .bPageBlock, body.rlHoverFrame .bPageBlock, 
+        body.subjectSelectionPopup div.choicesBox, body.lookupTab .secondaryPalette.bPageBlock, 
+        body.popupTab .secondaryPalette.bPageBlock, body.UserTagStatsPage .secondaryPalette.bPageBlock {
+        border-top: 0.5px solid  #eaeaea !important;
+        border-color: #eaeaea !important;
+        border-top-color: rgb(234, 234, 234);
+        }
+        
+        .slds-input{
+        color: #16325c;
+        border: 1px solid #bdbbb1;
+        border-radius: .25rem;
+        text-align:left;
+        transition: border .1s linear,background-color .1s linear;
+        display: inline-block;
+        padding: 0 1rem 0 .75rem;
+        padding-right: 1.8rem;
+        width: 80px;
+        line-height: 1.875rem;
+        min-height: calc(1.875rem + (1px * 2));
+        }
+        
+        .slds-input:focus{
+        border: 1px solid #f9df49;
+        }   
+        
+        .slds-input:invalid {
+        border: 1px solid red;
+        }
+        
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+        }
+        
+        input[type=number] {
+        -moz-appearance:textfield;
+        }
+         
+        a.tooltip {
+        position: relative;
+        text-decoration: none;
+        padding:0 0 0 0;
+        }
+        
+        a.tooltip span {
+        display: none;
+        padding:0 0 0 0;
+        }
+        
+        a.tooltip:hover span {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        display: block;
+        color: #16325c;
+        background-color: #A4A4A4;
+        border: 1px solid #d8dde6;
+        border-radius: .25rem;
+        padding: 5px;
+        }
+        
+        .headerRow .TableTitle {
+        color: #0d0d0d !important; 
+        text-align: center !important;
+        font-size:120% !important; 
+        font-weight:bold !important; 
+        }
+      
+        .slds-modal {
+        top: 80px !important;
+        left: 755px !important;
+        }
+        
+        .slds-modal__content {
+        background-color: #005fb2 !important; 
+        color: #FFFFFF !important; 
+        font-weight:bold !important; 
+        padding:0 0 0 0 !important;
+        width: 180px !important;
+        min-height: calc(1.875rem + (1px * 2));
+        }   
+        
+    </style>
+    
+    <script> 
+    var j$ =jQuery.noConflict(); 
+    
+    //Función para que al cargar la página, no se haga autofoco en ningún elemento
+    window.onload= function(){
+        document.formPrincipal.prioridad.focus();
+    } 
+    
+    //Función para abre el modal, tan pronto se carga la página, para mostrar la suma dinámica del total de los pesos
+    j$( document ).ready(function() {
+        j$('#Modal').addClass('slds-fade-in-open'); 
+        var $buttonG1 = jQuery('[id*=btnGuardar1]');
+        var $buttonG2 = jQuery('[id*=btnGuardar2]');
+        $buttonG1.toggleClass('btnDisabled', false).attr('disabled', 'disabled');
+        $buttonG2.toggleClass('btnDisabled', false).attr('disabled', 'disabled');
+    })
+    
+    //Función para ir a la parte superior de la página
+    function topLocation(){
+        window.scrollTo(0,0);
+    }
+    
+    //Función que valida el formulario para habilitar o inhabilitar los botones de guardar
+    function validar(){
+        var $buttonG1 = jQuery('[id*=btnGuardar1]');
+        var $buttonG2 = jQuery('[id*=btnGuardar2]');
+        var $myForm = jQuery('[id*=form]');
+        
+        if(! $myForm[0].checkValidity()) {       
+            $buttonG1.toggleClass('btnDisabled', false).attr('disabled', 'disabled');
+            $buttonG2.toggleClass('btnDisabled', false).attr('disabled', 'disabled');
+        } else {
+            $buttonG1.toggleClass('btnDisabled', false).attr('disabled', null);
+            $buttonG2.toggleClass('btnDisabled', false).attr('disabled', null);
+        }
+    }
+  
+    //Función para limitar los caracteres permitidos en los input text
+    function inputLimiter(e,allow) {
+        var AllowableCharacters = '';
+        if (allow == 'Numbers'){AllowableCharacters='1234567890.';}
+        var k = document.all?parseInt(e.keyCode): parseInt(e.which);
+        if (k!=13 && k!=8 && k!=0){
+            if ((e.ctrlKey==false) && (e.altKey==false)) {
+                return (AllowableCharacters.indexOf(String.fromCharCode(k))!=-1);
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }     
+    </script>
+    
+    <body>
+        <div class="slds-scope">
+            
+            <!-- Form principal -->
+            <apex:form id="formPrincipal">
+                <div class="slds-grid slds-text-align_center">
+                    <div class="slds-col">
+                        <br />
+                        <div class="slds-text-heading_medium"><center><b>PARAMETRIZACIÓN ESTATUS IMPLEMENTACIÓN DECRETO 1072</b></center></div>
+                        <br />
+                    </div>
+                </div>
+                <apex:outputPanel >
+                    <apex:pageBlock >
+                        <apex:outputPanel id="mensaje">
+                            <c:SST_Mensajes_Page id="mensajeGlobal" listaMensajes="{!mensajesPaginaPrincipalParametrizacion}"/>
+                        </apex:outputPanel>  
+                        <div >
+                            <apex:outputPanel >    
+                                <center><b><apex:commandButton id="btnGuardar1" action="{!guardarParametrizacion}" rerender="mensaje" styleClass="slds-button slds-button_brand" value="Guardar" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();"/></b></center>
+                                <br />               
+                            </apex:outputPanel>
+                        </div>
+                        <apex:pageBlockTable value="{!listaActividades}" var="item" styleclass="slds-table slds-table_bordered slds-table_cell-buffer" border="1">                            
+                            <apex:column headerValue="# LÍNEA" headerClass="TableTitle" style="text-align: center; vertical-align: middle;background:{!item.fondo};">
+                                <apex:outputText style="font-weight:bold; float: center;white-space: normal" value="{!item.linea}"/>
+                            </apex:column>
+                            <apex:column headerValue="CICLO" headerClass="TableTitle" styleClass="slds-text-align_center" style="text-align: left; vertical-align: middle;background:{!item.fondo};">
+                                <apex:outputText style="font-weight:bold; float: left;white-space: normal" value="{!item.descripcionPadre}"/>
+                            </apex:column>
+                            <apex:column headerValue="ARTÍCULO" headerClass="TableTitle" style="text-align: left; vertical-align: middle;background:{!item.fondo};">
+                                <apex:outputText style="font-weight:bold; float: left;white-space: normal" value="{!item.descripcionHijo}"/>
+                            </apex:column>
+                            <apex:column headerValue="ACTIVIDAD" headerClass="TableTitle" style="text-align: left; vertical-align: middle;background:{!item.fondo};">
+                                <apex:outputText style="float: left;white-space: normal" value="{!item.Descripcion}"/>
+                            </apex:column>
+                            <apex:column headerValue="PESO" headerClass="TableTitle" style="text-align: right; vertical-align: middle;background:{!item.fondo};"
+                                         title="Ingrese el porcentaje con el que será evaluada esta actividad.  Los valores permitidos están en el rango de 0 a 100.  Separe los decimales con punto.  Tenga en cuenta que la sumatoria de los porcentajes de todas las actividades deberá ser igual al 100%">
+                                    <apex:input type="text" styleClass="slds-input" size="3" style="width:70px; padding-right: 0.2rem;"
+                                                value="{!item.Peso}" html-maxlength="5" id="peso" rendered="{!item.Descripcion!=''}" 
+                                                required="true" html-min="0" html-max="100"
+                                                onkeypress="return inputLimiter(event,'Numbers');" html-onpaste="return false">
+                                    <apex:actionSupport event="onchange" reRender="tabla,total,total2,total3,modalMensaje5,porcentajeTotal,mensaje,mensajeGlobal" action="{!actualizarValoresParametrizacion}" onsubmit="showLoadingDialog();" oncomplete="hideLoadingDialog();validar();">
+                                    <apex:param value="{!item.Peso}" name="pesoModificar"/>
+                                        <apex:param value="{!item.idItem}" assignTo="{!idModificarParametrizacion}" name="itemModificar"/>
+                                    </apex:actionSupport>
+                                        </apex:input>    
+                            </apex:column>
+                            <apex:column headerClass="TableTitle" style="text-align: left; vertical-align: middle;background:{!item.fondo};" >
+                                <apex:outputText style="width:3%;float: left;" value="%" rendered="{!item.Descripcion!=''}"/>
+                            </apex:column>                            
+                        </apex:pageBlockTable>  
+                        
+                        <div class="slds-grid slds-gutters" id='total'>
+                            <div class="slds-col slds-size_7-of-8 slds-text-align_center" style="color: #FFFFFF; background: rgb(34, 33, 53) none repeat scroll 0% 0%;">
+                                <apex:outputText style="font-weight:bold; font-size:18px !important; text-align: center; float: top" value="PORCENTAJE TOTAL"/>
+                            </div>
+                            <div id="total2" class="slds-col slds-size_1-of-8 slds-text-align_center" style="color: #FFFFFF; background: rgb(34, 33, 53) none repeat scroll 0% 0%;">
+                                <apex:outputText id="total3" style="font-weight:bold; font-size:18px !important; text-align: center; float: top" value="{!puntajeTotalParametrizacion} %"/>
+                            </div>
+                        </div>
+                        <div >
+                            <apex:outputPanel id="g2">
+                                <br /> 
+                                <center><b><apex:commandButton id="btnGuardar2" action="{!guardarParametrizacion}" rerender="mensaje" styleClass="slds-button slds-button_brand" value="Guardar" onclick="showLoadingDialog();" oncomplete="hideLoadingDialog();topLocation();"/></b></center>
+                            </apex:outputPanel>
+                        </div>
+                    </apex:pageBlock>
+                </apex:outputPanel>
+                <div id="slds-backdrop" class="slds-backdrop"></div>
+           
+            
+            <!--Modal permanente que muestra la suma dinámica de todos los pesos que se ingresan en pantalla -->
+           
+               <section id="Modal"  role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal"  style="height: 25px;width: 50px;">
+                  
+                       <header class="slds-modal__header_empty">
+                       </header>
+                       <div class="slds-modal__content slds-p-around_medium" id="modalMensaje5">
+                           <center><b><apex:outputText value="PORCENTAJE TOTAL:" /></b></center>
+                           <center><b><apex:outputText id="porcentajeTotal" value="{!puntajeTotalParametrizacion} %"  /></b></center>
+                       </div>
+                   
+               </section>
+               <div id="slds-backdrop2" class="slds-backdrop"></div>
+           </apex:form>
+        </div>
+    </body>
+</apex:page>

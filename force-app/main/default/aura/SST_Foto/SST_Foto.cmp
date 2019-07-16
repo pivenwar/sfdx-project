@@ -1,0 +1,13 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" 
+                controller="SST_FotoCC">
+	<aura:attribute name="recordId" type="String" />
+    <lightning:fileUpload 
+                name="fileUploader"
+                multiple="false"
+                accept=".pdf, .png, .jpg"
+                recordId="{!v.recordId}" 
+                disabled="false"
+                onuploadfinished="{!c.handleUploadFinished}"/>
+    
+
+</aura:component>

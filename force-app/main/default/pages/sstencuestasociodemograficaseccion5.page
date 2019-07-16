@@ -1,0 +1,78 @@
+<apex:page id="sstencuestasociodemograficaseccion5" showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false"
+           applyBodyTag="false" docType="html-5.0" lightningStylesheets="true" 
+           controller="SST_EncuestaSociodemograficaCC">
+    
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="es">
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <head> 
+            <meta charset="utf-8" />
+            <meta http-equiv="x-ua-compatible" content="ie=edge" />
+            <title>ENCUESTA</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            
+            <!-- Import the Design System style sheet -->
+            <apex:slds />
+            
+            <!-- Recurso estático para indicar que se está ejecutando una acción en la página -->
+            <c:SST_StatusLoading />
+        </head>
+        <body class="slds-scope">
+            
+            <apex:form styleClass="myForm6">
+                <!-- Bloque con la cuarta sección de la encuesta -->
+                <apex:pageBlock id="seccion5" >                     
+                    <b> 
+                        SECCION 5: APROVECHAMIENTO DE ACTIVIDADES DE BIENESTAR
+                    </b>
+                    <br /><br />
+                    <div class="slds-form slds-form_stacked" role="list">
+                        <p><b>
+                            Los datos de esta sección serán actualizados directamente al finalizar la encuesta:
+                            </b></p>
+                        <br />
+                        <div class="slds-grid slds-gutters_small">
+                            <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                    <span title="Requerido" class="slds-form-element__label">{!$ObjectType.SST_Informacion_sociodemografica__c.fields.Actividades__c.inlineHelpText}:</span>
+                                    <span title="Requerido" style="color: red" class="slds-form-element__label">*</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form slds-form_compound">
+                                            <div class="slds-form-element__row">
+                                                <div class="slds-form-element slds-size_1-of-1">
+                                                    <div class="slds">
+                                                        <div class="slds-form-element">
+                                                            <apex:outputPanel id="seccionUsuarios4">
+                                                                <c:SST_MultiselectPicklist leftLabel="Disponibles"
+                                                                                           left="{!actividadesBienestarDisponibles}"
+                                                                                           rightLabel="Seleccionados"
+                                                                                           right="{!actividadesBienestarSeleccionados}"
+                                                                                           size="10"
+                                                                                           width="100%" height="330px"/>
+                                                            </apex:outputPanel>
+                                                        </div>
+                                                    </div>                                  
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="flex-container" >
+                        <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--4-of-4 slds-text-align_right">
+                                <button type="button" style="width:8%" target="_self" class="slds-button slds-button_neutral" onclick="devolver('5');"  >Atrás</button>
+                                <button type="button" target="_self" class="slds-button slds-button_brand" onclick="topLocation('5');"  >Finalizar</button>
+                            </div>
+                            <apex:actionFunction action="{!irAdelante}" onbeforedomupdate="hideLoadingDialog();" reRender="mensajeGlobal,secciones" name="irInicio" />
+                            <apex:actionFunction action="{!irAtras}" onbeforedomupdate="hideLoadingDialog();" reRender="secciones" name="irAtras4" />
+                        </div>
+                    </div>
+                </apex:pageBlock> 
+            </apex:form>
+        </body>
+    </html>
+</apex:page>

@@ -1,0 +1,69 @@
+            body .bPageBlock, body #bodyCell .bResource .secondaryPalette, 
+            body .secondaryPalette.bPageBlock, body .individualPalette .secondaryPalette.bPageBlock, 
+            body .bodyDiv .genericTable, body .genericPageBlockTable, body .bodyDiv .bSubBlock, 
+            body .bComponentBlock .bPageBlock, body .bMyDashboard .bPageBlock, body.rlHoverFrame .bPageBlock, 
+            body.subjectSelectionPopup div.choicesBox, body.lookupTab .secondaryPalette.bPageBlock, 
+            body.popupTab .secondaryPalette.bPageBlock, body.UserTagStatsPage .secondaryPalette.bPageBlock {
+            border: 0px solid  #ffffff !important;
+            border-color: #ffffff !important;
+            }
+            
+            div.pbBody{
+            max-width: 98%;
+            overflow-x: hidden; 
+            margin-left: 1%;
+            }
+            
+            .slds-input{
+            color: #16325c;
+            border: 1px solid #bdbbb1;
+            border-radius: .25rem;
+            text-align:left;
+            transition: border .1s linear,background-color .1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 .75rem;
+            padding-right: 1.8rem;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            }
+            
+            .slds-inputtextarea{
+            resize:none; 
+            border: 1px solid #bdbbb1; 
+            border-radius: .25rem; 
+            text-align:justify; 
+            transition: border .1s linear, background-color .1s linear; 
+            display: inline-block; 
+            padding: 0 1rem 0 .75rem; 
+            padding-right: 1.8rem; 
+            width: 95%;
+            }
+            
+            p{
+            width:100%;
+            text-align:justify;
+            }
+            
+            b{
+            width:100%;
+            text-align:center;
+            }
+            
+            .slds-scope .slds-select_container::before { 
+            border-bottom: none;
+            }
+            
+            .slds-scope .slds-select_container::after { 
+            height: 5px;
+            width: 7px;
+            top: 13px;
+            }
+            
+            input[type=date]::-webkit-inner-spin-button, 
+            input[type=date]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+            }
+            input[type=date] {
+            -moz-appearance:textfield;
+            }

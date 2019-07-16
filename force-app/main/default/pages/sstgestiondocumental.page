@@ -1,0 +1,432 @@
+<apex:page showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false"
+           applyBodyTag="false" docType="html-5.0" lightningStylesheets="true"
+           controller="SST_DocumentacionContactosCC">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="es">
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <head>
+            <meta charset="utf-8" />
+            <meta http-equiv="x-ua-compatible" content="ie=edge" />
+            <title>DOCUMENTACIÓN</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            
+            <!-- Import the Design System style sheet -->
+            <apex:slds />
+            
+            <!-- Recurso estático para indicar que se está ejecutando una acción en la página -->
+            <c:SST_StatusLoading />
+            
+            <!-- Recurso estático para importar todas las funciones javascript y estilos usados en las páginas de la encueesta -->
+            <apex:stylesheet value="{!URLFOR($Resource.SST_Scripts_and_StyleSheets, '/sststylesheetsgestiondocumental.css')}"/>
+    		<apex:includeScript value="{!URLFOR($Resource.SST_Scripts_and_StyleSheets, '/sstscriptsgestiondocumental.js')}"/>
+        </head>
+        <script>
+        var j$ =jQuery.noConflict();     
+        </script> 
+        <body class="slds-scope">
+            <!--form principal-->
+            <apex:form styleClass="myForm">
+                <div class="slds-scope">
+                    <div class="flex-container" >
+                        <div class="slds-grid slds-wrap slds-align_absolute-center">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                <div class="slds-text-align_center slds-form-element__control">
+                                    <apex:image style="width:70%" url="{!URLFOR($Resource.SST_logo_empresa, '/LogoHorizontal.jpg')}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                    <br /><br /><br />
+                    <div class="flex-container" >
+                        <div class="slds-grid slds-wrap slds-align_absolute-center">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--2-of-4">
+                                <div class="slds-text-align_center slds-form-element__control">
+                                    <apex:outputText id="text-input-028" style="color:black;font-weight:bold;font-size:1.3em;width:100%;background-color:#ffffff" value="MÓDULO DE GESTIÓN DOCUMENTAL PARA PROVEEDORES Y CONTRATISTAS" />
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                    
+                    <center>
+                        <apex:outputPanel id="mensaje">
+                            <br />
+                            <c:SST_Mensajes_Page id="mensajeGlobal" listaMensajes="{!mensajesPaginaPrincipal}"/>
+                            <br /><br />
+                        </apex:outputPanel>  
+                    </center>
+                    
+                    <!-- Bloque con el formulario para búsqueda del contacto por cédula -->
+                    <apex:pageBlock id="form1" rendered="{!NOT(mostrarInfo)}">    
+                        <div class="flex-container" >
+                            <div class="slds-grid slds-wrap slds-align_absolute-center">
+                                <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                    <div class="slds-text-align_center slds-form-element__control">
+                                        <apex:outputText value="BIENVENIDO" style="font-weight:bold;font-size:1.3em"></apex:outputText>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                        <br /><br /><br />
+                        <div class="flex-container" >
+                            <div class="slds-grid slds-wrap slds-align_absolute-center">
+                                <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--4-of-4">
+                                    <div class="slds-text-align_center slds-text-longformslds-form-element__control">
+                                        <p>
+                                            Desde este módulo podrá ver los documentos que la empresa ha definido para su evaluación como proveedor o contratista de la misma.  Aquí podrá anexar los archivos necesarios por primera vez, y actualizarlos antes o después de su vencimiento.
+                                            <br /> <br />
+                                            <b>
+                                                Para empezar digite su número de identificación sin puntos ni caracteres especiales, y el código de acceso proporcionado por correo electrónico:
+                                            </b>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                        <br /><br /><br />                            
+                        <div class="flex-container" >
+                            <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                    <label class="slds-form-element__label" for="text-input-01" >Código de acceso</label>
+                                    <div class="slds-form-element__control">
+                                        <apex:input id="text-input-028" styleClass="slds-input" style="width:100%;background-color:#ffffff" value="{!contacto.codigo}" />
+                                    </div>
+                                </div>
+                                <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--1-of-4">
+                                    <label class="slds-form-element__label" for="text-input-01" >Identificación</label>
+                                    <div class="slds-form-element__control">
+                                        <apex:input id="text-input-029" styleClass="slds-input" style="width:100%;background-color:#ffffff"
+                                                    value="{!contacto.identificacion}" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers');"
+                                                    html-onpaste="return false" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                        <br /><br />
+                        <div class="flex-container" >
+                            <div class="slds-grid slds-wrap slds-align_absolute-center">
+                                <b>
+                                    AUTORIZACIÓN PARA EL TRATAMIENTO DE DATOS PERSONALES
+                                    <br /><br />
+                                </b> 
+                                Los datos registrados serán tratados de acuerdo a la politica de protección de datos personales ley 1581 de 2012. 
+                                <br />
+                            </div> 
+                            <apex:actionRegion >
+                                <center>
+                                    <apex:commandLink value="Para ampliar información haga clic aquí." title="Ver la política" action="{!inicializarDocumento}"  reRender="ModalDocumento,modal-heading-04,objectHTML" 
+                                                      onclick="javascript:abrirModalDocumento();" />
+                                </center>
+                            </apex:actionRegion>
+                            <br />
+                            <div class="slds-grid slds-wrap slds-align_absolute-center">
+                                <label class="slds-form-element__label" for="input-checkbox" ><b>Acepto los términos</b></label>
+                                <div class="slds-form-element__control">
+                                    <apex:inputCheckbox value="{!contacto.autorizacion}" id="input-checkbox1"/>
+                                </div>
+                            </div> 
+                        </div> 
+                        <br />
+                        <div class="flex-container" >
+                            <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--2-of-4 slds-text-align_right">
+                                    <button type="button" target="_self" class="slds-button slds-button_neutral" onclick="limpiar();" reRender="mensajeGlobal" >Limpiar</button>
+                                    <button type="button" target="_self" class="slds-button slds-button_brand" onclick="buscar();this.disabled=true;" reRender="form2,mensajeGlobal" >Continuar</button>
+                                    <apex:actionFunction action="{!consultarContacto}" name="buscar" />
+                                    <apex:actionFunction action="{!cancelar}" name="limpiar" />
+                                </div>
+                            </div>
+                        </div> 
+                        <br /><br /><br />
+                    </apex:pageBlock>   
+                    
+                    <!-- Bloque con los datos del contacto y la lista de registros de gestión de documentos respectiva -->                    
+                    <apex:pageBlock id="form2" rendered="{!mostrarInfo}">
+                        <center>
+                            <apex:outputText value="DATOS DEL CONTACTO" style="font-weight:bold;font-size:1.3em"></apex:outputText>
+                        </center>    
+                        <br />
+                        <div class="slds-form slds-form_stacked" role="list">
+                            <div class="slds-grid slds-gutters_small">
+                                <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                    <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                        <span class="slds-form-element__label">Nombre</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static">{!contacto.nombre}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                    <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                        <span class="slds-form-element__label">Número de identificación</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static">{!contacto.identificacion}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-grid slds-gutters_small">
+                                <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                    <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                        <span class="slds-form-element__label">Tipo de contacto</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static">{!contacto.tipoContacto}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-col slds-has-flexi-truncate slds-grid" role="listitem">
+                                    <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-hint-parent">
+                                        <span class="slds-form-element__label">Estado</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static">{!contacto.estado}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br /><br /><br />
+                        <CENTER><apex:outputText value="DOCUMENTOS SOLICITADOS" style="font-weight:bold;font-size:1.3em"></apex:outputText></CENTER>
+                        <br />
+                        <div class="flex-container">
+                            <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--4-of-4">
+                                    <div class="slds-form-element__control">
+                                        <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal">
+                                            <thead>
+                                                <tr class="slds-line-height_reset">
+                                                    <th class="slds-text-title_caps slds-text-align_center" scope="col">
+                                                        <div class="slds-truncate slds-text-align_center" title="Tipo documento">Tipo documento</div>
+                                                    </th>
+                                                    <th class="slds-text-title_caps slds-text-align_center" scope="col">
+                                                        <div class="slds-truncate slds-text-align_center" title="Estado documento">Estado documento</div>
+                                                    </th>
+                                                    <th class="slds-text-title_caps slds-text-align_center" scope="col">
+                                                        <div class="slds-truncate slds-text-align_center" title="Fecha vencimiento">Fecha vencimiento</div>
+                                                    </th>
+                                                    <th class="slds-text-title_caps slds-text-align_center" scope="col">
+                                                        <div class="slds-truncate sslds-text-align_center" title="Archivo">Archivo</div>
+                                                    </th>
+                                                    <th class="slds-text-title_caps" scope="col">
+                                                        <div class="slds-truncate" title="Acciones"/>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <apex:repeat first="0" rows="{!documentos.size}" var="doc" value="{!documentos}">
+                                                    <tr class="slds-hint-parent">
+                                                        <td data-label="Tipo documento" scope="row">
+                                                            <div id="idInputDoc" class="slds-truncate" style="white-space:normal;width:100%" title="Tipo documento">{!doc.tipoDocumento}</div>
+                                                        </td>
+                                                        <td data-label="Estado documento">
+                                                            <div class="slds-truncate slds-text-align_center" title="Estado documento">{!doc.estadoDocumento}</div>
+                                                        </td>
+                                                        <td data-label="Fecha vencimiento">
+                                                            <div class="slds-truncate slds-text-align_center" title="Fecha vencimiento">{!doc.fechaVencimiento}</div>
+                                                        </td>
+                                                        <td data-label="Archivo">
+                                                            <div class="slds-truncate slds-text-align_right" style="white-space:normal;width:100%" title="Archivo">{!doc.nombreDocumento}</div>
+                                                        </td>
+                                                        <td class="slds-cell-shrink" data-label="Acciones">
+                                                            <apex:actionRegion >
+                                                                <apex:commandLink rendered="{!IF(doc.nombreDocumento=='',true,false)}" title="Subir archivo" action="{!recargar}"  reRender="formModal,modal-heading-03,Modal4,Modal3,Modal2"
+                                                                                  styleClass="slds-icon_container slds-icon-utility-file" style="text-decoration:none;border:none" oncomplete="javascript:abrirModal();">
+                                                                    <c:SST_ImagenesSVG styleClass="slds-icon slds-icon-text-default slds-icon_x-small" 
+                                                                                       path="/assets/icons/utility-sprite/svg/symbols.svg#file" />
+                                                                    <span class="slds-assistive-text">Subir archivo</span>
+                                                                    <apex:param value="{!doc.idDocumento}" assignTo="{!idSeleccionado}" name="idSeleccionado" />
+                                                                    <apex:param value="{!doc.tipoDocumento}" assignTo="{!tipoSeleccionado}" name="tipoSeleccionado" />
+                                                                </apex:commandLink> 
+                                                            </apex:actionRegion>
+                                                            <apex:actionRegion >
+                                                                <apex:commandLink rendered="{!IF(doc.nombreDocumento=='',false,true)}" title="Eliminar archivo" action="{!recargar}" oncomplete="javascript:abrirModalConfirmacion();"
+                                                                                  reRender="formModalEliminacion,modal-heading-033,Modal44,Modal33,Modal22" styleClass="slds-icon_container slds-icon-utility-delete" style="text-decoration:none;border:none" >
+                                                                    <c:SST_ImagenesSVG styleClass="slds-icon slds-icon-text-default slds-icon_x-small" 
+                                                                                       path="/assets/icons/utility-sprite/svg/symbols.svg#delete" />
+                                                                    <span class="slds-assistive-text">Eliminar archivo</span>
+                                                                    <apex:param value="{!doc.idDocumento}" assignTo="{!idSeleccionado}" name="idSeleccionado" />
+                                                                    <apex:param value="{!doc.tipoDocumento}" assignTo="{!tipoSeleccionado}" name="tipoSeleccionado" />
+                                                                    <apex:param value="{!doc.nombreDocumento}" assignTo="{!pathDocumento}" name="pathDocumento" />
+                                                                </apex:commandLink>
+                                                            </apex:actionRegion>
+                                                        </td>
+                                                    </tr>
+                                                </apex:repeat> 
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                        <br />
+                        <div class="flex-container" >
+                            <div class="slds-grid slds-wrap slds-align_absolute-center">
+                                <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--4-of-4">
+                                    <div class="slds-text-align_center slds-text-longformslds-form-element__control">
+                                        <p>
+                                            <b>
+                                                Si ya ha completado todos los anexos, seleccione la opción "Notificar", de esta forma la empresa será notificada para que realice la revisión de los archivos proporcionados por usted.  Si no ha cargado todos los anexos necesarios, puede ingresar en otro momento para terminar de cargar los archivos faltantes.  
+                                            </b>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                        <br /><br /><br />
+                        <div class="flex-container">
+                            <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                                <div class="slds-col slds-size--1-of-1 slds-small-size--1-of-2 slds-medium-size--4-of-4 slds-text-align_right">
+                                    <button type="button" target="_self" class="slds-button slds-button_neutral" onclick="volver();" reRender="mensajeGlobal" >Volver</button>
+                                    <button type="button" target="_self" class="slds-button slds-button_brand" onclick="abrirModalNotificacion();this.disabled=true;" reRender="form1,form2,mensajeGlobal" >Notificar</button>
+                                    <apex:actionFunction action="{!cancelar}" name="volver" />
+                                </div>
+                            </div>
+                        </div> 
+                        <br /><br /><br />
+                    </apex:pageBlock>
+                    <div class="flex-container">
+                        <div class="slds-grid slds-wrap slds-align_absolute-center">
+                            <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--1-of-4 slds-text-align_center slds-vertical-align-end">
+                                <apex:outputLink title="Ir al Módulo de comunicaciones SST" value="{!linkSST}" target="_blank">
+                                    <apex:image style="width:35%" url="{!URLFOR($Resource.LogoModuloComunicaciones, '/LOGO_SST_BLUE.png')}"/> 
+                                </apex:outputLink>
+                                <apex:outputLink title="Ir al portal de Heinsohn Business Technology" value="https://www.heinsohn.com.co" target="_blank">
+                                    <apex:image style="width:65%" url="{!URLFOR($Resource.LogoModuloComunicaciones, '/poweredHBT.JPG')}"/>
+                                </apex:outputLink>
+                            </div>
+                        </div>
+                    </div>                       
+                </div>
+                
+                
+                <!--Modal para adjuntar archivos a un registro de gestión de documentos-->   
+                <section id="Modal" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+                    <apex:outputPanel id="Modal2" >
+                        <div class="slds-modal__container">
+                            <header id="headerModal" class="slds-modal__header">
+                                <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModal();">
+                                    <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                       path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                    <span class="slds-assistive-text">Cerrar</span>
+                                </button>
+                                <apex:outputText id="modal-heading-03" style="font-weight: 300; float: center;white-space: normal; font-size: 1.1rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="Adjuntar archivo"/>
+                            </header>
+                            <apex:outputPanel id="Modal3">
+                                <div class="slds-modal__content slds-p-around_medium" >
+                                    <center>
+                                        <apex:outputLabel id="modal4-1" style="font-weight: 300; float: center; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="Seleccione el archivo a cargar para el tipo de documento "/><br />
+                                        <apex:outputLabel id="modal4" style="font-weight: 300; float: center; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="{!tipoSeleccionado}:"/>
+                                    </center>
+                                    <br /><br />
+                                    <apex:outputPanel styleClass="requiredInput" layout="block">
+                                        <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                                        <apex:inputFile accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg" styleClass="slds-button slds-button_neutral" style="border:none" title="Click para seleccionar el archivo"
+                                                        value="{!fileBody}" filename="{!fileName}" contentType="{!contentType}" fileSize="{!fileSize}"/>
+                                    </apex:outputPanel>
+                                </div>
+                            </apex:outputPanel>
+                            <footer class="slds-modal__footer">
+                                <button type="button" id='btnCerrar1' class="slds-button slds-button_neutral" data-dismiss="modal" onclick="cerrarModal();">Cancelar</button>
+                                <button type="button" id='btnAceptar1' class="slds-button slds-button_brand" rerender="form2" onclick="guardar();this.disabled=true;">Guardar</button>
+                            </footer>
+                        </div>
+                    </apex:outputPanel>
+                    <apex:actionFunction action="{!guardar}" name="guardar"/>    
+                </section>
+                <div id="slds-backdrop" class="slds-backdrop"></div>
+                
+                
+                <!--Modal para confirmar la eliminación de archivos adjuntos-->             
+                <section id="ModalE" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal ">
+                    <apex:outputPanel id="Modal22" >
+                        <div class="slds-modal__container">
+                            <header id="headerModal" class="slds-modal__header">
+                                <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModalConfirmacion();">
+                                    <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                       path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                    <span class="slds-assistive-text">Cerrar</span>
+                                </button>
+                                <apex:outputText id="modal-heading-033" style="font-weight: 300; float: center;white-space: normal; font-size: 1.1rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="Eliminar archivo"/>
+                            </header>
+                            <apex:outputPanel id="Modal33">
+                                <div class="slds-modal__content slds-p-around_medium" >
+                                    <center>
+                                        <apex:outputLabel id="modal44" style="font-weight: 300; float: center; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="El archivo anexo para el tipo de documento {!tipoSeleccionado} será eliminado."/>
+                                        <br/><br/>
+                                    </center> 
+                                    <center>
+                                        <apex:outputLabel id="modal-heading-035" style="font-weight: bold; float: center; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="¿Desea continuar?"/>
+                                    </center>
+                                </div>
+                            </apex:outputPanel>
+                            <footer class="slds-modal__footer">
+                                <button type="button" id='btnCerrar' class="slds-button slds-button_neutral" data-dismiss="modal" onclick="cerrarModalConfirmacion();">Cancelar</button>
+                                <button type="button" id='btnAceptar' class="slds-button slds-button_brand" rerender="form2" onclick="eliminar();this.disabled=true;">Eliminar</button>
+                            </footer>
+                        </div>
+                    </apex:outputPanel>
+                    <apex:actionFunction action="{!eliminar}" name="eliminar"/>    
+                </section>
+                <div id="slds-backdrop1" class="slds-backdrop"></div>
+                
+                
+                <!--Modal para confirmar notificación al área de SST de la empresa-->     
+                <section id="ModalN" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal ">
+                    <apex:outputPanel id="Modal222" >
+                        <div class="slds-modal__container">
+                            <header id="headerModal" class="slds-modal__header">
+                                <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModalNotificacion();">
+                                    <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                       path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                    <span class="slds-assistive-text">Cerrar</span>
+                                </button>
+                                <apex:outputText id="modal-heading-0333" style="font-weight: 300; float: center;white-space: normal; font-size: 1.1rem; color: rgb(107, 109, 112); font-family:'Salesforce Sans',Arial,sans-serif;" value="Notificar actualización"/>
+                            </header>
+                            <apex:outputPanel id="Modal333">
+                                <div class="slds-modal__content slds-p-around_medium" >
+                                    <center>
+                                        <apex:outputText id="modal-heading-0344" style="font-weight: 300; float: center; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="La empresa será notificada de la actualización de los anexos y ya no podrá modificar los archivos subidos a partir de este momento."/>
+                                        <br/><br/>
+                                    </center> 
+                                    <center>
+                                        <apex:outputText id="modal-heading-0355" style="font-weight: bold; float: center; font-size: 1.0rem; font-family:'Salesforce Sans',Arial,sans-serif;" value="¿Desea continuar?"/>
+                                    </center>
+                                </div>
+                            </apex:outputPanel>
+                            <footer class="slds-modal__footer">
+                                <button type="button" id='btnCerrar' class="slds-button slds-button_neutral" data-dismiss="modal" onclick="recargar();cerrarModalNotificacion();">Cancelar</button>
+                                <button type="button" id='btnAceptar' class="slds-button slds-button_brand" rerender="form2" onclick="notificar();this.disabled=true;">Aceptar</button>
+                            </footer>
+                        </div>
+                    </apex:outputPanel>
+                    <apex:actionFunction action="{!notificar}" name="notificar"/>    
+                    <apex:actionFunction action="{!recargar}" name="recargar"/>    
+                </section>
+                <div id="slds-backdrop2" class="slds-backdrop"></div>
+                
+                <!--Modal para visualización del PDF con la política de tratamiento de datos personales de la empresa-->
+                <section id="ModalDocumento" role="dialog" tabindex="-1" aria-labelledby="modal-heading-04" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-modal_large">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="cerrarModalDocumento();">
+                                <c:SST_ImagenesSVG styleClass="slds-button__icon slds-button__icon_large" 
+                                                   path="/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                <span class="slds-assistive-text">Cerrar</span>
+                            </button>
+                            <h2 id="modal-heading-04" class="slds-text-heading_medium slds-hyphenate">Ver Documento</h2>
+                        </header>
+                        <apex:outputPanel styleClass="slds-modal__content slds-p-around_medium">
+                            <apex:outputPanel id="objectHTML">
+                                <object class="content" data="{!url}" style="height: 550px; width:99%;"/>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                        <footer class="slds-modal__footer">
+                            <apex:outputPanel >
+                                <button type="button" id='btnCerrar' class="slds-button slds-button_neutral" data-dismiss="modal" onclick="cerrarModalDocumento();">Cerrar</button>
+                            </apex:outputPanel>
+                        </footer>
+                    </div>
+                </section>
+                <div id="slds-backdropDocumento" class="slds-backdrop"></div>
+            </apex:form> 
+        </body>
+    </html>
+</apex:page>

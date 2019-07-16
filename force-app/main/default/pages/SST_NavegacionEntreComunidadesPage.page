@@ -1,0 +1,80 @@
+<apex:page controller="SST_NavegacionEntreComunidadesCC">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <c:SST_StatusLoading />
+        
+        <head>
+            <!-- Lightning Design System Source -->
+            <apex:slds />
+            
+            <!-- jQuery CDN>
+<apex:includeScript value="{!URLFOR($Resource.INT_Recursos,'/JQuery/jquery-3.2.1.min.js')}" / -->
+        </head>
+        
+        <body class="slds-scope">
+            <apex:form id="gestionComunidades">
+                 <apex:outputPanel id="mensaje">
+                            <c:SST_Mensajes_Page id="mensajeGlobal" listaMensajes="{!mensajesPaginaPrincipal}"/>
+                        </apex:outputPanel>  
+                <div class="flex-container">
+                    <div class="slds-grid slds-wrap slds-align_absolute-center slds-grid--pull-padded">
+                        <div class="slds-col slds-size--1-of-1 slds-small-size--2-of-2 slds-medium-size--4-of-4">
+                            <div class="slds-form-element__control slds-align_absolute-center">
+                                <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal slds-align_absolute-center" style="border:none;">
+                                    <tbody>
+                                        <apex:repeat var="key" value="{!comunidades}">
+                                            <tr class="slds-hint-parent" >
+                                                <apex:outputPanel rendered="{!mod(comunidades[key].pos,2)=0}">
+                                                    <td class="slds-cell-shrink" style="border:none;">
+                                                        <fieldset class="slds-box slds-theme--default slds-container--large">
+                                                            <legend class="slds-text-heading--medium slds-p-vertical--medium">
+                                                                <div class="slds-p-horizontal--small slds-size--1-of-1 slds-m-top--medium">
+                                                                    <h3 class="slds-text-heading--small slds-m-bottom--medium"><b>{!comunidades[key].nombreEmpresa}</b></h3>
+                                                                </div>
+                                                            </legend> 
+                                                            <center>
+                                                                <apex:commandLink value="Ir a la comunidad" action="{!actualizarEmpresaAutenticada}"
+                                                                                  target="_parent" styleClass="slds-button slds-button_neutral" style="text-decoration:none">
+                                                                    <apex:param value="{!key}" assignTo="{!comunidad}" name="comunidad" />
+                                                                </apex:commandLink> 
+                                                            </center>
+                                                        </fieldset>
+                                                    </td>
+                                                </apex:outputPanel>
+                                            </tr>
+                                        </apex:repeat>                                         
+                                    </tbody>
+                                </table>
+                                <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal slds-align_absolute-center" style="border:none;">
+                                    <tbody>
+                                        <apex:repeat var="key" value="{!comunidades}">
+                                            <tr class="slds-hint-parent" >
+                                                
+                                                <apex:outputPanel rendered="{!mod(comunidades[key].pos,2)!=0}"> 
+                                                    <td class="slds-cell-shrink" style="border:none;">
+                                                        <fieldset class="slds-box slds-theme--default slds-container--large">
+                                                            <legend class="slds-text-heading--medium slds-p-vertical--medium">
+                                                                <div class="slds-p-horizontal--small slds-size--1-of-1 slds-m-top--medium">
+                                                                    <h3 class="slds-text-heading--small slds-m-bottom--medium"><b>{!comunidades[key].nombreEmpresa}</b></h3>
+                                                                </div>
+                                                            </legend>
+                                                            <center>
+                                                                <apex:commandLink value="Ir a la comunidad" action="{!actualizarEmpresaAutenticada}" reRender="mensajeGlobal"
+                                                                                  target="_parent" styleClass="slds-button slds-button_neutral" style="text-decoration:none">
+                                                                    <apex:param value="{!key}" assignTo="{!comunidad}" name="comunidad" />
+                                                                </apex:commandLink> 
+                                                            </center>
+                                                        </fieldset>
+                                                    </td>
+                                                </apex:outputPanel>
+                                            </tr>
+                                        </apex:repeat> 
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+            </apex:form>     
+        </body>
+    </html>
+</apex:page>

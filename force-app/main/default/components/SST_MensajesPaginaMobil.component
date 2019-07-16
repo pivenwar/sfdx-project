@@ -1,0 +1,18 @@
+<apex:component >
+    <apex:attribute name="listaMensajes" description="Label on left listbox."
+                    type="SST_MensajesPaginaMobil[]" required="true" />
+    <apex:repeat var="mensaje" value="{!listaMensajes}">
+        <div class="demo-only" style="height: 4rem; width: 19rem;">
+            <div class="slds-region_narrow slds-is-relative">
+                <div class="slds-notify_container slds-is-absolute" >
+                    <div class="slds-notify slds-notify_toast {!mensaje.claseDiv}" role="alert" >
+                        <span class="slds-assistive-text">{!mensaje.tipoMensaje}</span>
+                        <div class="slds-notify__content">
+                            <h2 style="font-weight:bold; font-size:1.2em; width: 16rem; text-align: center;" stylclass="slds-text-heading_small">{!mensaje.mensajePage}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </apex:repeat>
+</apex:component>
