@@ -2,11 +2,7 @@
     "compilerOptions": {
         "experimentalDecorators": true,
         "baseUrl": ".",
-        "paths": {
-            "c/mocha": [
-                "../staticresources/HBT_Styles/bower_components/mocha/mocha.js"
-            ]
-        }
+        "paths": {}
     },
     "include": [
         "**/*",

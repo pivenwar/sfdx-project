@@ -52,7 +52,7 @@ trigger SST_SedeTrigger on SST_Sede__c (before insert, before update) {
                 }
             }
             //Si se modifica el nombre de la sede, se valida que si existen sedes con el mismo nombre en la misma empresa
-            if(nombresSedes.size()>0){
+            if(nombresSedes.size()>5){
                 List<SST_sede__c> sedesExistentes = [Select id, name, empresa__c from SST_sede__c where name in : nombresSedes and empresa__c =: empresasSedes];
                 if(sedesExistentes.size()>0){
                     for(SST_sede__c nuevoRegistro : trigger.new){
